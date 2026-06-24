@@ -1,0 +1,1 @@
+export const MESSAGE_PREVIEW_LENGTH = 96;

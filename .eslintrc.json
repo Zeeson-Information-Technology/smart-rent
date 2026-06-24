@@ -1,0 +1,4 @@
+{
+  "ignorePatterns": ["next-env.d.ts", "smartrent/**"],
+  "extends": ["next/core-web-vitals", "next/typescript"]
+}
