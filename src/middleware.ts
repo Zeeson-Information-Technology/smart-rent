@@ -27,13 +27,16 @@ export async function middleware(request: NextRequest) {
   });
 
   const isProtectedRoute = protectedRoutePrefixes.some((route) =>
-    pathname.startsWith(route),
+    pathname === route || pathname.startsWith(`${route}/`),
   );
   const isAuthRoute = authRoutes.includes(pathname);
 
   if (isProtectedRoute && !token) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", request.nextUrl.href);
+    loginUrl.searchParams.set(
+      "callbackUrl",
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
 
     return NextResponse.redirect(loginUrl);
   }

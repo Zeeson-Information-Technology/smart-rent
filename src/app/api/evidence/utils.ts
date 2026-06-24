@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 
 import { DisputeModel, IssueModel, UserModel } from "@/database/models";
-import { cloudinary } from "@/lib/cloudinary";
+import { getCloudinaryClient } from "@/lib/cloudinary";
 import { connectMongoDB } from "@/lib/mongodb";
 import type { DisputeDocument, EvidenceDocument, IssueDocument } from "@/database/models";
 import type { EvidenceType, UserRole } from "@/types/database";
@@ -131,7 +131,7 @@ export async function uploadEvidenceToCloudinary(
   file: ValidatedEvidenceFile,
   folder: "issues" | "disputes" = "issues",
 ) {
-  return cloudinary.uploader.upload(file.dataUri, {
+  return getCloudinaryClient().uploader.upload(file.dataUri, {
     folder: `smartrent/${folder}`,
     resource_type: file.fileType === "pdf" ? "raw" : "image",
     type: "upload",
@@ -139,7 +139,7 @@ export async function uploadEvidenceToCloudinary(
 }
 
 export async function deleteEvidenceFromCloudinary(evidence: EvidenceDocument) {
-  await cloudinary.uploader.destroy(evidence.cloudinaryPublicId, {
+  await getCloudinaryClient().uploader.destroy(evidence.cloudinaryPublicId, {
     resource_type: evidence.fileType === "pdf" ? "raw" : "image",
   });
 }

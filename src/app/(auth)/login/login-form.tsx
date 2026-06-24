@@ -19,9 +19,9 @@ export function LoginForm() {
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
-    const callbackUrl =
-      new URLSearchParams(window.location.search).get("callbackUrl") ??
-      "/dashboard";
+    const callbackUrl = getSafeCallbackUrl(
+      new URLSearchParams(window.location.search).get("callbackUrl"),
+    );
 
     const result = await signIn("credentials", {
       email: formData.get("email"),
@@ -99,4 +99,22 @@ export function LoginForm() {
       </Button>
     </form>
   );
+}
+
+function getSafeCallbackUrl(callbackUrl: string | null) {
+  if (!callbackUrl) {
+    return "/dashboard";
+  }
+
+  try {
+    const parsedUrl = new URL(callbackUrl, window.location.origin);
+
+    if (parsedUrl.origin !== window.location.origin) {
+      return "/dashboard";
+    }
+
+    return `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+  } catch {
+    return "/dashboard";
+  }
 }
