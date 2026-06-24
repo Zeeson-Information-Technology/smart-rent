@@ -35,7 +35,7 @@ const securitySections = [
   {
     icon: MailWarning,
     title: "Responsible disclosure",
-    body: "Security concerns can be reported to hello@smartrent.example with enough detail for review and responsible remediation.",
+    body: "Security concerns can be reported to hello@smartrent.co.uk with enough detail for review and responsible remediation.",
   },
 ];
 

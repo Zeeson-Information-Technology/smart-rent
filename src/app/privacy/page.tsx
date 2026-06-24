@@ -35,7 +35,7 @@ const privacySections = [
   {
     icon: Mail,
     title: "Contact information",
-    body: "Privacy questions can be directed to SmartRent, 123 Canary Wharf, London, E14 5AB, United Kingdom or hello@smartrent.example.",
+    body: "Privacy questions can be directed to SmartRent, 123 Canary Wharf, London, E14 5AB, United Kingdom or hello@smartrent.co.uk.",
   },
 ];
 

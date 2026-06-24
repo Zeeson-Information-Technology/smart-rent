@@ -20,7 +20,7 @@ const contactItems = [
   {
     icon: Mail,
     title: "Email",
-    lines: ["hello@smartrent.example"],
+    lines: ["hello@smartrent.co.uk"],
   },
   {
     icon: Phone,

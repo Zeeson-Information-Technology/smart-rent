@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   },
   description:
     "Smart landlord and tenant dispute documentation and property management platform.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

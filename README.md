@@ -115,6 +115,7 @@ The script creates realistic demo data:
 
 Use these files for final testing and dissertation Chapter 4 evidence:
 
+- [QA and research testing guide](docs/qa-research-testing-guide.md)
 - [Testing checklist](docs/testing-checklist.md)
 - [Screenshot checklist](docs/screenshot-checklist.md)
 
