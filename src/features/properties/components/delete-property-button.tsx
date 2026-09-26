@@ -64,7 +64,9 @@ export function DeletePropertyButton({
         <Trash2 className="h-4 w-4" aria-hidden="true" />
         {isDeleting ? "Deleting..." : label}
       </Button>
-      {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+      {error ? (
+        <p className="text-sm font-medium text-red-600">{error}</p>
+      ) : null}
     </div>
   );
 }

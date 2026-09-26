@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button, Card, CardContent, CardHeader, Input } from "@/components/ui";
@@ -23,6 +24,8 @@ const defaultValues: TenancyFormValues = {
   propertyId: "",
   tenantName: "",
   tenantEmail: "",
+  tenantPhone: "",
+  additionalTenants: [],
   startDate: "",
   endDate: "",
   rentAmount: "",
@@ -38,6 +41,10 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
           propertyId: tenancy.propertyId,
           tenantName: tenancy.tenantName,
           tenantEmail: tenancy.tenantEmail,
+          tenantPhone: tenancy.tenantPhone,
+          additionalTenants: tenancy.additionalTenants.map(
+            ({ name, email, phone }) => ({ name, email, phone }),
+          ),
           startDate: toDateInputValue(tenancy.startDate),
           endDate: tenancy.endDate ? toDateInputValue(tenancy.endDate) : "",
           rentAmount: String(tenancy.rentAmount),
@@ -72,8 +79,7 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
       setProperties(nextProperties);
       setValues((currentValues) => ({
         ...currentValues,
-        propertyId:
-          currentValues.propertyId || nextProperties[0]?.id || "",
+        propertyId: currentValues.propertyId || nextProperties[0]?.id || "",
       }));
       setIsLoadingProperties(false);
     }
@@ -91,7 +97,8 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
     setFieldErrors({});
     setMessage(null);
 
-    const endpoint = mode === "create" ? "/api/tenancies" : `/api/tenancies/${tenancy?.id}`;
+    const endpoint =
+      mode === "create" ? "/api/tenancies" : `/api/tenancies/${tenancy?.id}`;
     const method = mode === "create" ? "POST" : "PUT";
 
     const response = await fetch(endpoint, {
@@ -112,14 +119,18 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
     }
 
     const nextId = result?.tenancy?.id as string | undefined;
-    router.push(mode === "create" ? "/tenancies" : `/tenancies/${nextId ?? tenancy?.id}`);
+    router.push(
+      mode === "create" ? "/tenancies" : `/tenancies/${nextId ?? tenancy?.id}`,
+    );
     router.refresh();
   }
 
   return (
     <Card className="max-w-3xl">
       <CardHeader>
-        <h2 className="text-lg font-semibold text-slate-950">Tenancy details</h2>
+        <h2 className="text-lg font-semibold text-slate-950">
+          Tenancy details
+        </h2>
         <p className="mt-1 text-sm text-slate-600">
           Link a tenant to one of your managed properties.
         </p>
@@ -133,19 +144,26 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
           ) : null}
 
           <FieldError errors={fieldErrors.propertyId}>
-            <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="propertyId">
+            <label
+              className="grid gap-2 text-sm font-medium text-slate-700"
+              htmlFor="propertyId"
+            >
               Property
               <select
                 className="h-11 rounded-lg border bg-white px-3 text-sm shadow-sm outline-none focus:border-primary focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50"
                 disabled={isLoadingProperties || properties.length === 0}
                 id="propertyId"
                 name="propertyId"
-                onChange={(event) => updateValue("propertyId", event.target.value)}
+                onChange={(event) =>
+                  updateValue("propertyId", event.target.value)
+                }
                 value={values.propertyId}
               >
                 {properties.length === 0 ? (
                   <option value="">
-                    {isLoadingProperties ? "Loading properties..." : "No properties available"}
+                    {isLoadingProperties
+                      ? "Loading properties..."
+                      : "No properties available"}
                   </option>
                 ) : null}
                 {properties.map((property) => (
@@ -162,7 +180,9 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
               <Input
                 label="Tenant name"
                 name="tenantName"
-                onChange={(event) => updateValue("tenantName", event.target.value)}
+                onChange={(event) =>
+                  updateValue("tenantName", event.target.value)
+                }
                 placeholder="Mia Thompson"
                 type="text"
                 value={values.tenantName}
@@ -172,7 +192,9 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
               <Input
                 label="Tenant email"
                 name="tenantEmail"
-                onChange={(event) => updateValue("tenantEmail", event.target.value)}
+                onChange={(event) =>
+                  updateValue("tenantEmail", event.target.value)
+                }
                 placeholder="tenant@example.com"
                 type="email"
                 value={values.tenantEmail}
@@ -180,12 +202,100 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
             </FieldError>
           </div>
 
+          <FieldError errors={fieldErrors.tenantPhone}>
+            <Input
+              label="Primary tenant contact number"
+              name="tenantPhone"
+              onChange={(event) =>
+                updateValue("tenantPhone", event.target.value)
+              }
+              placeholder="+44 7700 900123"
+              type="tel"
+              value={values.tenantPhone}
+            />
+          </FieldError>
+
+          <div className="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h3 className="font-semibold text-slate-950">
+                  Additional tenants
+                </h3>
+                <p className="text-sm text-slate-600">
+                  Add joint tenants and their contact information.
+                </p>
+              </div>
+              <Button
+                onClick={() =>
+                  updateValue("additionalTenants", [
+                    ...values.additionalTenants,
+                    { name: "", email: "", phone: "" },
+                  ])
+                }
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" /> Add tenant
+              </Button>
+            </div>
+            {values.additionalTenants.map((tenant, index) => (
+              <div
+                className="grid gap-3 rounded-lg border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto]"
+                key={index}
+              >
+                <Input
+                  label="Name"
+                  onChange={(event) =>
+                    updateAdditionalTenant(index, "name", event.target.value)
+                  }
+                  value={tenant.name}
+                />
+                <Input
+                  label="Email"
+                  onChange={(event) =>
+                    updateAdditionalTenant(index, "email", event.target.value)
+                  }
+                  type="email"
+                  value={tenant.email}
+                />
+                <Input
+                  label="Contact number"
+                  onChange={(event) =>
+                    updateAdditionalTenant(index, "phone", event.target.value)
+                  }
+                  type="tel"
+                  value={tenant.phone}
+                />
+                <Button
+                  aria-label="Remove tenant"
+                  className="h-9 w-9 self-end px-0"
+                  onClick={() =>
+                    updateValue(
+                      "additionalTenants",
+                      values.additionalTenants.filter(
+                        (_, itemIndex) => itemIndex !== index,
+                      ),
+                    )
+                  }
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </div>
+            ))}
+          </div>
+
           <div className="grid gap-5 sm:grid-cols-2">
             <FieldError errors={fieldErrors.startDate}>
               <Input
                 label="Start date"
                 name="startDate"
-                onChange={(event) => updateValue("startDate", event.target.value)}
+                onChange={(event) =>
+                  updateValue("startDate", event.target.value)
+                }
                 type="date"
                 value={values.startDate}
               />
@@ -207,14 +317,19 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
                 label="Rent amount"
                 min="1"
                 name="rentAmount"
-                onChange={(event) => updateValue("rentAmount", event.target.value)}
+                onChange={(event) =>
+                  updateValue("rentAmount", event.target.value)
+                }
                 placeholder="2450"
                 type="number"
                 value={values.rentAmount}
               />
             </FieldError>
             <FieldError errors={fieldErrors.status}>
-              <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="status">
+              <label
+                className="grid gap-2 text-sm font-medium text-slate-700"
+                htmlFor="status"
+              >
                 Status
                 <select
                   className="h-11 rounded-lg border bg-white px-3 text-sm capitalize shadow-sm outline-none focus:border-primary focus:ring-4 focus:ring-blue-100"
@@ -237,7 +352,9 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
-              disabled={isSubmitting || isLoadingProperties || properties.length === 0}
+              disabled={
+                isSubmitting || isLoadingProperties || properties.length === 0
+              }
               type="submit"
             >
               {isSubmitting
@@ -268,6 +385,19 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
       ...currentValues,
       [key]: value,
     }));
+  }
+
+  function updateAdditionalTenant(
+    index: number,
+    key: "name" | "email" | "phone",
+    value: string,
+  ) {
+    updateValue(
+      "additionalTenants",
+      values.additionalTenants.map((tenant, itemIndex) =>
+        itemIndex === index ? { ...tenant, [key]: value } : tenant,
+      ),
+    );
   }
 }
 

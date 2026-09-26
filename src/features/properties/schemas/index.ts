@@ -15,6 +15,7 @@ export const propertySchema = z.object({
     errorMap: () => ({ message: "Select a valid property status" }),
   }),
   description: z.string().trim().optional(),
+  bedroomCount: z.coerce.number().int().min(0).max(100),
 });
 
 export const updatePropertySchema = propertySchema.partial({
@@ -26,6 +27,7 @@ export const updatePropertySchema = propertySchema.partial({
   propertyType: true,
   status: true,
   description: true,
+  bedroomCount: true,
 });
 
 export type PropertyInput = z.infer<typeof propertySchema>;

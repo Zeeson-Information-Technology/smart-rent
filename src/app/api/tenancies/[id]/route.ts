@@ -74,10 +74,15 @@ export async function PUT(request: Request, context: TenancyRouteContext) {
   let property = await PropertyModel.findOne({ _id: tenancy.propertyId });
 
   if (parsedBody.data.propertyId) {
-    property = await findAccessibleProperty(parsedBody.data.propertyId, session.user);
+    property = await findAccessibleProperty(
+      parsedBody.data.propertyId,
+      session.user,
+    );
 
     if (!property) {
-      return forbiddenResponse("You cannot move this tenancy to that property.");
+      return forbiddenResponse(
+        "You cannot move this tenancy to that property.",
+      );
     }
 
     tenancy.propertyId = property._id.toString();
@@ -97,6 +102,22 @@ export async function PUT(request: Request, context: TenancyRouteContext) {
 
   if (parsedBody.data.tenantName !== undefined) {
     tenancy.tenantName = parsedBody.data.tenantName;
+  }
+
+  if (parsedBody.data.tenantPhone !== undefined) {
+    tenancy.tenantPhone = parsedBody.data.tenantPhone;
+  }
+
+  if (parsedBody.data.additionalTenants !== undefined) {
+    tenancy.additionalTenants = await Promise.all(
+      parsedBody.data.additionalTenants.map(async (tenant) => {
+        const email = tenant.email.toLowerCase();
+        const user = await UserModel.findOne({ email, role: "tenant" }).select(
+          "_id",
+        );
+        return { ...tenant, email, tenantId: user?._id.toString() ?? null };
+      }),
+    );
   }
 
   if (parsedBody.data.startDate !== undefined) {

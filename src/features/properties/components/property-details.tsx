@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { AlertCircle, Building2, MapPin, Pencil, Scale, User } from "lucide-react";
+import {
+  AlertCircle,
+  Building2,
+  MapPin,
+  Pencil,
+  Scale,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -16,6 +23,7 @@ import { Button, Card, CardContent, CardHeader } from "@/components/ui";
 import type { PropertyRecord } from "@/features/properties/types";
 
 import { DeletePropertyButton } from "./delete-property-button";
+import { InventoryManager } from "./inventory-manager";
 import { PropertyStatusBadge } from "./property-status-badge";
 import { PropertyTypeBadge } from "./property-type-badge";
 
@@ -81,7 +89,9 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-slate-600">Loading property...</p>
+        <p className="text-sm font-medium text-slate-600">
+          Loading property...
+        </p>
       </div>
     );
   }
@@ -123,8 +133,17 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
         eyebrow="Property details"
         title={property.propertyName}
       />
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard icon={Building2} label="Property type" value={property.propertyType} />
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          icon={Building2}
+          label="Property type"
+          value={property.propertyType}
+        />
+        <StatCard
+          icon={Building2}
+          label="Bedrooms"
+          value={property.bedroomCount.toString()}
+        />
         <StatCard icon={User} label="Assigned tenant" value="Not connected" />
         <StatCard icon={AlertCircle} label="Open issues" value="0" />
       </div>
@@ -138,12 +157,22 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
           <CardContent className="grid gap-4 text-sm">
             <InfoRow label="Name" value={property.propertyName} />
             <InfoRow label="Address" value={formatAddress(property)} />
-            <InfoRow label="Type" value={<PropertyTypeBadge propertyType={property.propertyType} />} />
-            <InfoRow label="Status" value={<PropertyStatusBadge status={property.status} />} />
+            <InfoRow
+              label="Type"
+              value={<PropertyTypeBadge propertyType={property.propertyType} />}
+            />
+            <InfoRow
+              label="Status"
+              value={<PropertyStatusBadge status={property.status} />}
+            />
             <InfoRow label="Created" value={formatDate(property.createdAt)} />
             <div className="flex gap-2 rounded-xl border bg-slate-50 p-4 text-slate-600">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" aria-hidden="true" />
-              {property.description || "No property description has been added yet."}
+              <MapPin
+                className="mt-0.5 h-4 w-4 shrink-0 text-blue-600"
+                aria-hidden="true"
+              />
+              {property.description ||
+                "No property description has been added yet."}
             </div>
           </CardContent>
         </Card>
@@ -157,18 +186,35 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
             <InfoRow label="Current tenant" value="Not connected yet" />
             <InfoRow label="Tenancy status" value="Tenancy module pending" />
             <InfoRow label="Monthly rent" value="Not connected yet" />
-            <InfoRow label="Last updated" value={formatDate(property.updatedAt)} />
+            <InfoRow
+              label="Last updated"
+              value={formatDate(property.updatedAt)}
+            />
           </CardContent>
         </Card>
       </div>
+      <InventoryManager propertyId={property.id} />
       <section className="mt-6">
-        <h2 className="mb-3 text-lg font-semibold text-slate-950">Related issues</h2>
+        <h2 className="mb-3 text-lg font-semibold text-slate-950">
+          Related issues
+        </h2>
         <DataTable
           columns={[
-            { header: "Issue", render: (row) => <span className="font-medium text-slate-950">{row.title}</span> },
+            {
+              header: "Issue",
+              render: (row) => (
+                <span className="font-medium text-slate-950">{row.title}</span>
+              ),
+            },
             { header: "Reported", render: (row) => row.reported },
-            { header: "Priority", render: (row) => <PriorityBadge priority={row.priority} /> },
-            { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+            {
+              header: "Priority",
+              render: (row) => <PriorityBadge priority={row.priority} />,
+            },
+            {
+              header: "Status",
+              render: (row) => <StatusBadge status={row.status} />,
+            },
           ]}
           rows={placeholderIssues}
         />
@@ -180,9 +226,19 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
         </h2>
         <DataTable
           columns={[
-            { header: "Dispute", render: (row) => <span className="font-medium text-slate-950">{row.caseName}</span> },
+            {
+              header: "Dispute",
+              render: (row) => (
+                <span className="font-medium text-slate-950">
+                  {row.caseName}
+                </span>
+              ),
+            },
             { header: "Owner", render: (row) => row.owner },
-            { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+            {
+              header: "Status",
+              render: (row) => <StatusBadge status={row.status} />,
+            },
           ]}
           rows={placeholderDisputes}
         />
@@ -191,13 +247,7 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
   );
 }
 
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: ReactNode;
-}) {
+function InfoRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4 rounded-xl border bg-white p-4">
       <span className="text-slate-500">{label}</span>

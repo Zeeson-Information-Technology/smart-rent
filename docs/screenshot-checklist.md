@@ -8,6 +8,7 @@ Capture these screens for dissertation Chapter 4. Use seeded demo data where pos
 | SS-002 | Features page | `/features` | Public | Shows platform feature scope | Pending |
 | SS-003 | Register page | `/register` | Public | Shows account onboarding and role selection | Pending |
 | SS-004 | Login page | `/login` | Public | Shows authentication entry point | Pending |
+| SS-004A | Contact form | `/contact` | Public | Shows backend-backed enquiry form and contact details | Pending |
 | SS-005 | Landlord dashboard | `/dashboard` | Landlord | Shows role-based landlord analytics and recent records | Pending |
 | SS-006 | Tenant dashboard | `/dashboard` | Tenant | Shows tenant-specific tenancy, issue, dispute, and message summary | Pending |
 | SS-007 | Admin dashboard | `/dashboard` | Admin | Shows platform-wide administrative summary | Pending |

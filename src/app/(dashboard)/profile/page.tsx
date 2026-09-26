@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bell, Building2, ShieldCheck, User } from "lucide-react";
 
+import { auth } from "@/auth";
 import { PageHeader, StatCard } from "@/components/dashboard";
 import { Badge, Card, CardContent, CardHeader, Input } from "@/components/ui";
 
@@ -8,17 +9,27 @@ export const metadata: Metadata = {
   title: "Profile",
 };
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const session = await auth();
+  const name = session?.user?.name ?? "SmartRent user";
+  const email = session?.user?.email ?? "";
+  const role = session?.user?.role ?? "tenant";
+  const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+
   return (
     <>
       <PageHeader
-        description="Static account profile and workspace settings preview."
+        description="Review your account and workspace preferences."
         eyebrow="Account"
         title="Profile"
       />
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard icon={User} label="Role" value="Landlord" />
-        <StatCard icon={Building2} label="Workspace" value="1" />
+        <StatCard icon={User} label="Role" value={roleLabel} />
+        <StatCard
+          icon={Building2}
+          label="Workspace"
+          value={`${roleLabel} portal`}
+        />
         <StatCard icon={ShieldCheck} label="Security status" value="Ready" />
       </div>
       <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
@@ -26,13 +37,13 @@ export default function ProfilePage() {
           <CardHeader>
             <h2 className="text-lg font-semibold text-slate-950">Profile information</h2>
             <p className="mt-1 text-sm text-slate-600">
-              Static fields only. Account updates are not connected yet.
+              Account details from your authenticated SmartRent session.
             </p>
           </CardHeader>
           <CardContent className="grid gap-4">
-            <Input label="Full name" name="name" placeholder="Alex Morgan" type="text" />
-            <Input label="Email" name="email" placeholder="alex@smartrent.example" type="email" />
-            <Input label="Company" name="company" placeholder="Canary Wharf Homes" type="text" />
+            <Input disabled label="Full name" name="name" type="text" value={name} />
+            <Input disabled label="Email" name="email" type="email" value={email} />
+            <Input disabled label="Account role" name="role" type="text" value={roleLabel} />
           </CardContent>
         </Card>
         <Card>

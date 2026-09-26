@@ -27,7 +27,9 @@ export async function GET(_request: Request, context: PropertyRouteContext) {
   }
 
   if (session.user.role === "tenant") {
-    return forbiddenResponse("Tenants cannot access property records directly.");
+    return forbiddenResponse(
+      "Tenants cannot access property records directly.",
+    );
   }
 
   const { id } = await context.params;
@@ -85,7 +87,9 @@ export async function DELETE(_request: Request, context: PropertyRouteContext) {
   }
 
   if (!canManageProperties(session.user.role)) {
-    return forbiddenResponse("Only landlords and admins can delete properties.");
+    return forbiddenResponse(
+      "Only landlords and admins can delete properties.",
+    );
   }
 
   const { id } = await context.params;

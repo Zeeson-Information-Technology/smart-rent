@@ -10,19 +10,26 @@ export type ApiSessionUser = {
   role: UserRole;
 };
 
-export function forbiddenResponse(message = "You are not authorized to access this resource.") {
+export function forbiddenResponse(
+  message = "You are not authorized to access this resource.",
+) {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
 export function unauthenticatedResponse() {
-  return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  return NextResponse.json(
+    { error: "Authentication is required." },
+    { status: 401 },
+  );
 }
 
 export function notFoundResponse() {
   return NextResponse.json({ error: "Property not found." }, { status: 404 });
 }
 
-export function validationErrorResponse(fieldErrors: Record<string, string[] | undefined>) {
+export function validationErrorResponse(
+  fieldErrors: Record<string, string[] | undefined>,
+) {
   return NextResponse.json(
     {
       error: "Validation failed.",
@@ -44,9 +51,7 @@ export async function findAccessibleProperty(id: string, user: ApiSessionUser) {
   await connectMongoDB();
 
   const query =
-    user.role === "admin"
-      ? { _id: id }
-      : { _id: id, landlordId: user.id };
+    user.role === "admin" ? { _id: id } : { _id: id, landlordId: user.id };
 
   return PropertyModel.findOne(query);
 }
@@ -62,6 +67,7 @@ export function serializeProperty(property: PropertyDocument) {
     propertyType: property.propertyType,
     status: property.status,
     description: property.description ?? "",
+    bedroomCount: property.bedroomCount ?? 0,
     createdAt: property.createdAt.toISOString(),
     updatedAt: property.updatedAt.toISOString(),
   };

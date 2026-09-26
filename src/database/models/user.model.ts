@@ -1,4 +1,10 @@
-import { Schema, model, models, type HydratedDocument, type Model } from "mongoose";
+import {
+  Schema,
+  model,
+  models,
+  type HydratedDocument,
+  type Model,
+} from "mongoose";
 
 import { USER_ROLES } from "@/constants";
 import type { User } from "@/types/database";

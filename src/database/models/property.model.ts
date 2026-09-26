@@ -1,4 +1,10 @@
-import { Schema, model, models, type HydratedDocument, type Model } from "mongoose";
+import {
+  Schema,
+  model,
+  models,
+  type HydratedDocument,
+  type Model,
+} from "mongoose";
 
 import { PROPERTY_STATUSES, PROPERTY_TYPES } from "@/constants";
 import type { Property } from "@/types/database";
@@ -46,6 +52,13 @@ const propertySchema = new Schema<PropertyDocument>(
     description: {
       type: String,
       trim: true,
+    },
+    bedroomCount: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+      max: 100,
     },
   },
   {

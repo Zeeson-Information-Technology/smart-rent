@@ -51,14 +51,20 @@ export function MyTenancyView() {
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-slate-600">Loading your tenancy...</p>
+        <p className="text-sm font-medium text-slate-600">
+          Loading your tenancy...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <EmptyState description={error} icon={Home} title="Unable to load tenancy" />
+      <EmptyState
+        description={error}
+        icon={Home}
+        title="Unable to load tenancy"
+      />
     );
   }
 

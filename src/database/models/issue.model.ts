@@ -1,6 +1,16 @@
-import { Schema, model, models, type HydratedDocument, type Model } from "mongoose";
+import {
+  Schema,
+  model,
+  models,
+  type HydratedDocument,
+  type Model,
+} from "mongoose";
 
-import { ISSUE_CATEGORIES, ISSUE_PRIORITIES, ISSUE_STATUSES } from "@/constants";
+import {
+  ISSUE_CATEGORIES,
+  ISSUE_PRIORITIES,
+  ISSUE_STATUSES,
+} from "@/constants";
 import type { Issue } from "@/types/database";
 
 export type IssueDocument = HydratedDocument<Omit<Issue, "id">>;

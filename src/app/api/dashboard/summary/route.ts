@@ -26,7 +26,10 @@ export async function GET() {
   const session = await auth();
 
   if (!session?.user) {
-    return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+    return NextResponse.json(
+      { error: "Authentication is required." },
+      { status: 401 },
+    );
   }
 
   await connectMongoDB();
@@ -46,7 +49,9 @@ type DashboardUser = {
   role: UserRole;
 };
 
-async function getDashboardSummary(user: DashboardUser): Promise<DashboardSummary> {
+async function getDashboardSummary(
+  user: DashboardUser,
+): Promise<DashboardSummary> {
   if (user.role === "admin") {
     return getAdminSummary(user);
   }
@@ -58,7 +63,9 @@ async function getDashboardSummary(user: DashboardUser): Promise<DashboardSummar
   return getLandlordSummary(user);
 }
 
-async function getLandlordSummary(user: DashboardUser): Promise<DashboardSummary> {
+async function getLandlordSummary(
+  user: DashboardUser,
+): Promise<DashboardSummary> {
   const issueQuery = { landlordId: user.id };
   const disputeQuery = { landlordId: user.id };
   const tenancyQuery = { landlordId: user.id };
@@ -77,10 +84,18 @@ async function getLandlordSummary(user: DashboardUser): Promise<DashboardSummary
   ] = await Promise.all([
     PropertyModel.countDocuments({ landlordId: user.id }),
     TenancyModel.countDocuments({ ...tenancyQuery, status: "active" }),
-    IssueModel.countDocuments({ ...issueQuery, status: { $in: openIssueStatuses } }),
-    DisputeModel.countDocuments({ ...disputeQuery, status: { $in: activeDisputeStatuses } }),
+    IssueModel.countDocuments({
+      ...issueQuery,
+      status: { $in: openIssueStatuses },
+    }),
+    DisputeModel.countDocuments({
+      ...disputeQuery,
+      status: { $in: activeDisputeStatuses },
+    }),
     MessageModel.countDocuments({ receiverId: user.id, isRead: false }),
-    TenancyModel.find({ ...tenancyQuery, status: "active" }).select("rentAmount"),
+    TenancyModel.find({ ...tenancyQuery, status: "active" }).select(
+      "rentAmount",
+    ),
     getIssueResolutionCounts(issueQuery),
     getRecentIssues(issueQuery),
     getRecentDisputes(disputeQuery),
@@ -90,11 +105,46 @@ async function getLandlordSummary(user: DashboardUser): Promise<DashboardSummary
   return {
     role: "landlord",
     stats: [
-      stat("Total Properties", totalProperties, "building", "/properties", "View all properties", "blue"),
-      stat("Active Tenancies", activeTenancies, "users", "/tenancies", "View all tenancies", "emerald"),
-      stat("Open Issues", openIssues, "alert", "/issues", "View all issues", "orange"),
-      stat("Active Disputes", activeDisputes, "scale", "/disputes", "View all disputes", "rose"),
-      stat("Unread Messages", unreadMessages, "message", "/messages", "Open messages", "emerald"),
+      stat(
+        "Total Properties",
+        totalProperties,
+        "building",
+        "/properties",
+        "View all properties",
+        "blue",
+      ),
+      stat(
+        "Active Tenancies",
+        activeTenancies,
+        "users",
+        "/tenancies",
+        "View all tenancies",
+        "emerald",
+      ),
+      stat(
+        "Open Issues",
+        openIssues,
+        "alert",
+        "/issues",
+        "View all issues",
+        "orange",
+      ),
+      stat(
+        "Active Disputes",
+        activeDisputes,
+        "scale",
+        "/disputes",
+        "View all disputes",
+        "rose",
+      ),
+      stat(
+        "Unread Messages",
+        unreadMessages,
+        "message",
+        "/messages",
+        "Open messages",
+        "emerald",
+      ),
     ],
     recentIssues,
     recentDisputes,
@@ -102,7 +152,10 @@ async function getLandlordSummary(user: DashboardUser): Promise<DashboardSummary
     monthlyOverview: {
       activeTenancies,
       expectedMonthlyRent: sumRent(expectedRentRows),
-      issueResolutionRate: calculateResolutionRate(issueTotals.total, issueTotals.resolved),
+      issueResolutionRate: calculateResolutionRate(
+        issueTotals.total,
+        issueTotals.resolved,
+      ),
       openDisputes: activeDisputes,
       totalProperties,
     },
@@ -110,14 +163,25 @@ async function getLandlordSummary(user: DashboardUser): Promise<DashboardSummary
   };
 }
 
-async function getTenantSummary(user: DashboardUser): Promise<DashboardSummary> {
+async function getTenantSummary(
+  user: DashboardUser,
+): Promise<DashboardSummary> {
   const tenantTenancyQuery = {
-    $or: [{ tenantId: user.id }, { tenantEmail: user.email.toLowerCase() }],
+    $or: [
+      { tenantId: user.id },
+      { tenantEmail: user.email.toLowerCase() },
+      { "additionalTenants.tenantId": user.id },
+      { "additionalTenants.email": user.email.toLowerCase() },
+    ],
   };
-  const tenancies = await TenancyModel.find(tenantTenancyQuery).select("_id propertyId status rentAmount");
+  const tenancies = await TenancyModel.find(tenantTenancyQuery).select(
+    "_id propertyId status rentAmount",
+  );
   const tenancyIds = tenancies.map((tenancy) => tenancy._id.toString());
   const propertyIds = tenancies.map((tenancy) => tenancy.propertyId);
-  const issueQuery = { $or: [{ tenantId: user.id }, { tenancyId: { $in: tenancyIds } }] };
+  const issueQuery = {
+    $or: [{ tenantId: user.id }, { tenancyId: { $in: tenancyIds } }],
+  };
   const disputeQuery = { tenantId: user.id };
 
   const [
@@ -131,8 +195,14 @@ async function getTenantSummary(user: DashboardUser): Promise<DashboardSummary> 
     recentMessages,
   ] = await Promise.all([
     TenancyModel.countDocuments({ ...tenantTenancyQuery, status: "active" }),
-    IssueModel.countDocuments({ ...issueQuery, status: { $in: openIssueStatuses } }),
-    DisputeModel.countDocuments({ ...disputeQuery, status: { $in: activeDisputeStatuses } }),
+    IssueModel.countDocuments({
+      ...issueQuery,
+      status: { $in: openIssueStatuses },
+    }),
+    DisputeModel.countDocuments({
+      ...disputeQuery,
+      status: { $in: activeDisputeStatuses },
+    }),
     MessageModel.countDocuments({ receiverId: user.id, isRead: false }),
     getIssueResolutionCounts(issueQuery),
     getRecentIssues(issueQuery),
@@ -143,10 +213,38 @@ async function getTenantSummary(user: DashboardUser): Promise<DashboardSummary> 
   return {
     role: "tenant",
     stats: [
-      stat("Active Tenancy", activeTenancy, "home", "/my-tenancy", "View tenancy", "blue"),
-      stat("Open Issues", openIssues, "alert", "/issues", "View issues", "orange"),
-      stat("Active Disputes", activeDisputes, "scale", "/disputes", "View disputes", "rose"),
-      stat("Unread Messages", unreadMessages, "message", "/messages", "Open messages", "emerald"),
+      stat(
+        "Active Tenancy",
+        activeTenancy,
+        "home",
+        "/my-tenancy",
+        "View tenancy",
+        "blue",
+      ),
+      stat(
+        "Open Issues",
+        openIssues,
+        "alert",
+        "/issues",
+        "View issues",
+        "orange",
+      ),
+      stat(
+        "Active Disputes",
+        activeDisputes,
+        "scale",
+        "/disputes",
+        "View disputes",
+        "rose",
+      ),
+      stat(
+        "Unread Messages",
+        unreadMessages,
+        "message",
+        "/messages",
+        "Open messages",
+        "emerald",
+      ),
     ],
     recentIssues,
     recentDisputes,
@@ -154,7 +252,10 @@ async function getTenantSummary(user: DashboardUser): Promise<DashboardSummary> 
     monthlyOverview: {
       activeTenancies: activeTenancy,
       expectedMonthlyRent: sumRent(tenancies),
-      issueResolutionRate: calculateResolutionRate(issueTotals.total, issueTotals.resolved),
+      issueResolutionRate: calculateResolutionRate(
+        issueTotals.total,
+        issueTotals.resolved,
+      ),
       openDisputes: activeDisputes,
       totalProperties: new Set(propertyIds).size,
     },
@@ -193,12 +294,40 @@ async function getAdminSummary(user: DashboardUser): Promise<DashboardSummary> {
     role: "admin",
     stats: [
       stat("Total Users", totalUsers, "users", "/users", "View users", "blue"),
-      stat("Landlords", totalLandlords, "user", "/users", "View landlords", "emerald"),
+      stat(
+        "Landlords",
+        totalLandlords,
+        "user",
+        "/users",
+        "View landlords",
+        "emerald",
+      ),
       stat("Tenants", totalTenants, "user", "/users", "View tenants", "orange"),
-      stat("Properties", totalProperties, "building", "/properties", "View properties", "rose"),
-      stat("Tenancies", totalTenancies, "home", "/tenancies", "View tenancies", "emerald"),
+      stat(
+        "Properties",
+        totalProperties,
+        "building",
+        "/properties",
+        "View properties",
+        "rose",
+      ),
+      stat(
+        "Tenancies",
+        totalTenancies,
+        "home",
+        "/tenancies",
+        "View tenancies",
+        "emerald",
+      ),
       stat("Issues", totalIssues, "alert", "/issues", "View issues", "orange"),
-      stat("Disputes", totalDisputes, "scale", "/disputes", "View disputes", "rose"),
+      stat(
+        "Disputes",
+        totalDisputes,
+        "scale",
+        "/disputes",
+        "View disputes",
+        "rose",
+      ),
     ],
     recentIssues,
     recentDisputes,
@@ -248,7 +377,10 @@ function stat(
 async function getIssueResolutionCounts(query: object) {
   const [total, resolved] = await Promise.all([
     IssueModel.countDocuments(query),
-    IssueModel.countDocuments({ ...query, status: { $in: ["resolved", "closed"] } }),
+    IssueModel.countDocuments({
+      ...query,
+      status: { $in: ["resolved", "closed"] },
+    }),
   ]);
 
   return { resolved, total };
@@ -259,7 +391,10 @@ async function getRecentIssues(query: object): Promise<DashboardRecentIssue[]> {
   const propertyIds = [...new Set(issues.map((issue) => issue.propertyId))];
   const properties = await PropertyModel.find({ _id: { $in: propertyIds } });
   const propertiesById = new Map(
-    properties.map((property) => [property._id.toString(), property.propertyName]),
+    properties.map((property) => [
+      property._id.toString(),
+      property.propertyName,
+    ]),
   );
 
   return issues.map((issue) => ({
@@ -272,16 +407,25 @@ async function getRecentIssues(query: object): Promise<DashboardRecentIssue[]> {
   }));
 }
 
-async function getRecentDisputes(query: object): Promise<DashboardRecentDispute[]> {
-  const disputes = await DisputeModel.find(query).sort({ updatedAt: -1 }).limit(5);
-  const propertyIds = [...new Set(disputes.map((dispute) => dispute.propertyId))];
+async function getRecentDisputes(
+  query: object,
+): Promise<DashboardRecentDispute[]> {
+  const disputes = await DisputeModel.find(query)
+    .sort({ updatedAt: -1 })
+    .limit(5);
+  const propertyIds = [
+    ...new Set(disputes.map((dispute) => dispute.propertyId)),
+  ];
   const tenantIds = [...new Set(disputes.map((dispute) => dispute.tenantId))];
   const [properties, tenants] = await Promise.all([
     PropertyModel.find({ _id: { $in: propertyIds } }),
     UserModel.find({ _id: { $in: tenantIds } }),
   ]);
   const propertiesById = new Map(
-    properties.map((property) => [property._id.toString(), property.propertyName]),
+    properties.map((property) => [
+      property._id.toString(),
+      property.propertyName,
+    ]),
   );
   const tenantsById = new Map(
     tenants.map((tenant) => [tenant._id.toString(), tenant.name]),
@@ -297,14 +441,21 @@ async function getRecentDisputes(query: object): Promise<DashboardRecentDispute[
   }));
 }
 
-async function getRecentMessages(userId: string, role: UserRole): Promise<DashboardRecentMessage[]> {
+async function getRecentMessages(
+  userId: string,
+  role: UserRole,
+): Promise<DashboardRecentMessage[]> {
   const query = role === "admin" ? {} : { participants: userId };
-  const conversations = await ConversationModel.find(query).sort({ lastMessageAt: -1 }).limit(5);
+  const conversations = await ConversationModel.find(query)
+    .sort({ lastMessageAt: -1 })
+    .limit(5);
   const otherUserIds = conversations.flatMap((conversation) =>
     conversation.participants.filter((participant) => participant !== userId),
   );
   const users = await UserModel.find({ _id: { $in: otherUserIds } });
-  const usersById = new Map(users.map((user) => [user._id.toString(), user.name]));
+  const usersById = new Map(
+    users.map((user) => [user._id.toString(), user.name]),
+  );
 
   return conversations.map((conversation) => {
     const otherParticipant = conversation.participants.find(
@@ -315,7 +466,7 @@ async function getRecentMessages(userId: string, role: UserRole): Promise<Dashbo
       href: `/messages/${conversation._id.toString()}`,
       preview: conversation.lastMessage,
       sender: otherParticipant
-        ? usersById.get(otherParticipant) ?? "SmartRent user"
+        ? (usersById.get(otherParticipant) ?? "SmartRent user")
         : "SmartRent conversation",
       time: formatDate(conversation.lastMessageAt),
     };

@@ -33,12 +33,16 @@ export async function GET() {
             $or: [
               { tenantId: session.user.id },
               { tenantEmail: session.user.email.toLowerCase() },
+              { "additionalTenants.tenantId": session.user.id },
+              { "additionalTenants.email": session.user.email.toLowerCase() },
             ],
           }
         : { landlordId: session.user.id };
 
   const tenancies = await TenancyModel.find(query).sort({ createdAt: -1 });
-  const propertyIds = [...new Set(tenancies.map((tenancy) => tenancy.propertyId))];
+  const propertyIds = [
+    ...new Set(tenancies.map((tenancy) => tenancy.propertyId)),
+  ];
   const properties = await PropertyModel.find({ _id: { $in: propertyIds } });
   const propertiesById = new Map(
     properties.map((property) => [
@@ -72,7 +76,10 @@ export async function POST(request: Request) {
     return validationErrorResponse(parsedBody.error.flatten().fieldErrors);
   }
 
-  const property = await findAccessibleProperty(parsedBody.data.propertyId, session.user);
+  const property = await findAccessibleProperty(
+    parsedBody.data.propertyId,
+    session.user,
+  );
 
   if (!property) {
     return forbiddenResponse("You cannot create a tenancy for this property.");
@@ -83,6 +90,15 @@ export async function POST(request: Request) {
     email: tenantEmail,
     role: "tenant",
   });
+  const additionalTenants = await Promise.all(
+    parsedBody.data.additionalTenants.map(async (tenant) => {
+      const email = tenant.email.toLowerCase();
+      const user = await UserModel.findOne({ email, role: "tenant" }).select(
+        "_id",
+      );
+      return { ...tenant, email, tenantId: user?._id.toString() ?? null };
+    }),
+  );
 
   const tenancy = await TenancyModel.create({
     propertyId: property._id.toString(),
@@ -90,6 +106,8 @@ export async function POST(request: Request) {
     tenantId: tenantUser?._id.toString() ?? parsedBody.data.tenantId,
     tenantName: parsedBody.data.tenantName,
     tenantEmail,
+    tenantPhone: parsedBody.data.tenantPhone,
+    additionalTenants,
     startDate: new Date(parsedBody.data.startDate),
     endDate: parsedBody.data.endDate
       ? new Date(parsedBody.data.endDate)

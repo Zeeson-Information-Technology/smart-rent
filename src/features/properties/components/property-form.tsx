@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 
 import { Button, Card, CardContent, CardHeader, Input } from "@/components/ui";
 import { PROPERTY_STATUSES, PROPERTY_TYPES } from "@/constants";
-import type { PropertyFormValues, PropertyRecord } from "@/features/properties/types";
+import type {
+  PropertyFormValues,
+  PropertyRecord,
+} from "@/features/properties/types";
 import type { PropertyStatus, PropertyType } from "@/types/database";
 
 type FieldErrors = Partial<Record<keyof PropertyFormValues, string[]>>;
@@ -23,6 +26,7 @@ const defaultValues: PropertyFormValues = {
   propertyType: "Apartment",
   status: "active",
   description: "",
+  bedroomCount: "0",
 };
 
 export function PropertyForm({ mode, property }: PropertyFormProps) {
@@ -38,6 +42,7 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           propertyType: property.propertyType,
           status: property.status,
           description: property.description,
+          bedroomCount: String(property.bedroomCount),
         }
       : defaultValues,
   );
@@ -51,7 +56,8 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
     setFieldErrors({});
     setMessage(null);
 
-    const endpoint = mode === "create" ? "/api/properties" : `/api/properties/${property?.id}`;
+    const endpoint =
+      mode === "create" ? "/api/properties" : `/api/properties/${property?.id}`;
     const method = mode === "create" ? "POST" : "PUT";
 
     const response = await fetch(endpoint, {
@@ -72,7 +78,11 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
     }
 
     const nextId = result?.property?.id as string | undefined;
-    router.push(mode === "create" ? "/properties" : `/properties/${nextId ?? property?.id}`);
+    router.push(
+      mode === "create"
+        ? "/properties"
+        : `/properties/${nextId ?? property?.id}`,
+    );
     router.refresh();
   }
 
@@ -98,7 +108,9 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             <Input
               label="Property name"
               name="propertyName"
-              onChange={(event) => updateValue("propertyName", event.target.value)}
+              onChange={(event) =>
+                updateValue("propertyName", event.target.value)
+              }
               placeholder="Canary Wharf Apartment 8B"
               type="text"
               value={values.propertyName}
@@ -131,7 +143,9 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
               <Input
                 label="Postcode"
                 name="postcode"
-                onChange={(event) => updateValue("postcode", event.target.value)}
+                onChange={(event) =>
+                  updateValue("postcode", event.target.value)
+                }
                 placeholder="E14 5AB"
                 type="text"
                 value={values.postcode}
@@ -139,16 +153,36 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
             </FieldError>
           </div>
 
+          <FieldError errors={fieldErrors.bedroomCount}>
+            <Input
+              label="Number of bedrooms"
+              min="0"
+              max="100"
+              name="bedroomCount"
+              onChange={(event) =>
+                updateValue("bedroomCount", event.target.value)
+              }
+              type="number"
+              value={values.bedroomCount}
+            />
+          </FieldError>
+
           <div className="grid gap-5 sm:grid-cols-2">
             <FieldError errors={fieldErrors.propertyType}>
-              <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="propertyType">
+              <label
+                className="grid gap-2 text-sm font-medium text-slate-700"
+                htmlFor="propertyType"
+              >
                 Property type
                 <select
                   className="h-11 rounded-lg border bg-white px-3 text-sm shadow-sm outline-none focus:border-primary focus:ring-4 focus:ring-blue-100"
                   id="propertyType"
                   name="propertyType"
                   onChange={(event) =>
-                    updateValue("propertyType", event.target.value as PropertyType)
+                    updateValue(
+                      "propertyType",
+                      event.target.value as PropertyType,
+                    )
                   }
                   value={values.propertyType}
                 >
@@ -161,7 +195,10 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
               </label>
             </FieldError>
             <FieldError errors={fieldErrors.status}>
-              <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="status">
+              <label
+                className="grid gap-2 text-sm font-medium text-slate-700"
+                htmlFor="status"
+              >
                 Status
                 <select
                   className="h-11 rounded-lg border bg-white px-3 text-sm capitalize shadow-sm outline-none focus:border-primary focus:ring-4 focus:ring-blue-100"
@@ -183,13 +220,18 @@ export function PropertyForm({ mode, property }: PropertyFormProps) {
           </div>
 
           <FieldError errors={fieldErrors.description}>
-            <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="description">
+            <label
+              className="grid gap-2 text-sm font-medium text-slate-700"
+              htmlFor="description"
+            >
               Description
               <textarea
                 className="min-h-32 rounded-lg border bg-white px-3 py-3 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-blue-100"
                 id="description"
                 name="description"
-                onChange={(event) => updateValue("description", event.target.value)}
+                onChange={(event) =>
+                  updateValue("description", event.target.value)
+                }
                 placeholder="Add layout notes, management details, or inspection context."
                 value={values.description}
               />

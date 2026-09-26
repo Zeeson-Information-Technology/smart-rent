@@ -1,7 +1,11 @@
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
 
-import { PropertyModel, TenancyModel, type TenancyDocument } from "@/database/models";
+import {
+  PropertyModel,
+  TenancyModel,
+  type TenancyDocument,
+} from "@/database/models";
 import { connectMongoDB } from "@/lib/mongodb";
 import type { Property, UserRole } from "@/types/database";
 
@@ -19,10 +23,15 @@ type PropertySummary = Pick<
 };
 
 export function unauthenticatedResponse() {
-  return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  return NextResponse.json(
+    { error: "Authentication is required." },
+    { status: 401 },
+  );
 }
 
-export function forbiddenResponse(message = "You are not authorized to access this resource.") {
+export function forbiddenResponse(
+  message = "You are not authorized to access this resource.",
+) {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
@@ -30,7 +39,9 @@ export function notFoundResponse() {
   return NextResponse.json({ error: "Tenancy not found." }, { status: 404 });
 }
 
-export function validationErrorResponse(fieldErrors: Record<string, string[] | undefined>) {
+export function validationErrorResponse(
+  fieldErrors: Record<string, string[] | undefined>,
+) {
   return NextResponse.json(
     {
       error: "Validation failed.",
@@ -58,14 +69,22 @@ export async function findAccessibleTenancy(id: string, user: ApiSessionUser) {
   if (user.role === "tenant") {
     return TenancyModel.findOne({
       _id: id,
-      $or: [{ tenantId: user.id }, { tenantEmail: user.email.toLowerCase() }],
+      $or: [
+        { tenantId: user.id },
+        { tenantEmail: user.email.toLowerCase() },
+        { "additionalTenants.tenantId": user.id },
+        { "additionalTenants.email": user.email.toLowerCase() },
+      ],
     });
   }
 
   return TenancyModel.findOne({ _id: id, landlordId: user.id });
 }
 
-export async function findAccessibleProperty(propertyId: string, user: ApiSessionUser) {
+export async function findAccessibleProperty(
+  propertyId: string,
+  user: ApiSessionUser,
+) {
   if (!Types.ObjectId.isValid(propertyId)) {
     return null;
   }
@@ -91,6 +110,13 @@ export function serializeTenancy(
     tenantId: tenancy.tenantId ?? null,
     tenantName: tenancy.tenantName,
     tenantEmail: tenancy.tenantEmail,
+    tenantPhone: tenancy.tenantPhone ?? "",
+    additionalTenants: (tenancy.additionalTenants ?? []).map((tenant) => ({
+      tenantId: tenant.tenantId ?? null,
+      name: tenant.name,
+      email: tenant.email,
+      phone: tenant.phone,
+    })),
     startDate: tenancy.startDate.toISOString(),
     endDate: tenancy.endDate?.toISOString() ?? null,
     rentAmount: tenancy.rentAmount,

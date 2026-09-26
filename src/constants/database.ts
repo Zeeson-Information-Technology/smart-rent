@@ -37,17 +37,22 @@ export const PROPERTY_TYPES = [
   "Commercial",
 ] as const;
 
-export const PROPERTY_STATUSES = [
-  "active",
-  "inactive",
-  "maintenance",
-] as const;
+export const PROPERTY_STATUSES = ["active", "inactive", "maintenance"] as const;
 
 export const TENANCY_STATUSES = [
   "active",
   "pending",
   "ended",
   "cancelled",
+] as const;
+
+export const INVENTORY_CONDITIONS = ["new", "good", "fair", "poor"] as const;
+
+export const RENT_PAYMENT_STATUSES = [
+  "pending",
+  "partial",
+  "paid",
+  "overdue",
 ] as const;
 
 export const EVIDENCE_TYPES = ["image", "pdf"] as const;

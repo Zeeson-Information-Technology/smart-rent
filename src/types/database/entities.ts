@@ -10,6 +10,8 @@ import type {
   PROPERTY_STATUSES,
   PROPERTY_TYPES,
   TENANCY_STATUSES,
+  INVENTORY_CONDITIONS,
+  RENT_PAYMENT_STATUSES,
   USER_ROLES,
 } from "@/constants";
 
@@ -21,6 +23,8 @@ export type DisputeStatus = (typeof DISPUTE_STATUSES)[number];
 export type PropertyType = (typeof PROPERTY_TYPES)[number];
 export type PropertyStatus = (typeof PROPERTY_STATUSES)[number];
 export type TenancyStatus = (typeof TENANCY_STATUSES)[number];
+export type InventoryCondition = (typeof INVENTORY_CONDITIONS)[number];
+export type RentPaymentStatus = (typeof RENT_PAYMENT_STATUSES)[number];
 export type EvidenceType = (typeof EVIDENCE_TYPES)[number];
 export type MessageStatus = (typeof MESSAGE_STATUSES)[number];
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
@@ -55,6 +59,14 @@ export interface Property extends BaseEntity {
   propertyType: PropertyType;
   status: PropertyStatus;
   description?: string;
+  bedroomCount: number;
+}
+
+export interface TenancyTenant {
+  tenantId?: string | null;
+  name: string;
+  email: string;
+  phone: string;
 }
 
 export interface Tenancy extends BaseEntity {
@@ -63,10 +75,35 @@ export interface Tenancy extends BaseEntity {
   tenantId?: string | null;
   tenantName: string;
   tenantEmail: string;
+  tenantPhone: string;
+  additionalTenants: TenancyTenant[];
   startDate: Date;
   endDate?: Date;
   rentAmount: number;
   status: TenancyStatus;
+}
+
+export interface InventoryItem extends BaseEntity {
+  propertyId: string;
+  landlordId: string;
+  name: string;
+  category: string;
+  condition: InventoryCondition;
+  quantity: number;
+  notes?: string;
+  imageUrl?: string;
+  cloudinaryPublicId?: string;
+}
+
+export interface RentPayment extends BaseEntity {
+  tenancyId: string;
+  landlordId: string;
+  dueDate: Date;
+  amountDue: number;
+  amountPaid: number;
+  status: RentPaymentStatus;
+  paidAt?: Date;
+  notes?: string;
 }
 
 export interface Issue extends BaseEntity {
@@ -137,4 +174,11 @@ export interface Notification extends BaseEntity {
   relatedEntityType?: NotificationRelatedEntityType;
   relatedEntityId?: string;
   isRead: boolean;
+}
+
+export interface ContactMessage extends BaseEntity {
+  name: string;
+  email: string;
+  message: string;
+  status: "new" | "reviewed";
 }

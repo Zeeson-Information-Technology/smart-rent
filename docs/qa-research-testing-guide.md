@@ -109,7 +109,30 @@ Routes:
 | `/login` | Login form loads |
 | `/register` | Register form loads |
 
-## 7. Authentication Tests
+## 7. Contact Form Backend Test
+
+Use the public `/contact` page before logging in.
+
+Valid submission:
+
+1. Open `/contact`.
+2. Enter a valid name, email address, and message of at least 10 characters.
+3. Select `Send message`.
+4. Confirm a success message appears.
+5. Confirm the request to `/api/contact` returns `201`.
+6. Confirm the message exists in MongoDB in the `contactmessages` collection.
+
+Invalid submission:
+
+1. Open `/contact`.
+2. Enter a valid name.
+3. Enter an invalid email address.
+4. Enter a message shorter than 10 characters.
+5. Select `Send message`.
+6. Confirm validation errors are shown.
+7. Confirm no message is saved.
+
+## 8. Authentication Tests
 
 | Scenario | Steps | Expected Result |
 | --- | --- | --- |
@@ -121,7 +144,7 @@ Routes:
 | Route protection | Open `/dashboard` while logged out | Redirects to `/login` |
 | Auth route redirect | Open `/login` while logged in | Redirects to `/dashboard` |
 
-## 8. Role-Based Access Tests
+## 9. Role-Based Access Tests
 
 | Role | Allowed | Blocked |
 | --- | --- | --- |
@@ -129,7 +152,7 @@ Routes:
 | Tenant | `/dashboard`, `/my-tenancy`, `/issues`, `/messages`, `/disputes`, `/documents`, `/profile`, `/notifications` | `/properties/new`, `/tenancies/new`, property edit, tenancy edit |
 | Admin | Platform-wide dashboard, users, properties, issues, disputes, reports, profile | No tenant/landlord private data should be editable without intended admin route support |
 
-## 9. Landlord Workflow Tests
+## 10. Landlord Workflow Tests
 
 1. Login as landlord.
 2. Open `/dashboard`.
@@ -148,7 +171,7 @@ Routes:
 15. Open `/disputes` and update dispute status/resolution notes.
 16. Open notification bell and verify relevant notifications display.
 
-## 10. Tenant Workflow Tests
+## 11. Tenant Workflow Tests
 
 1. Login as tenant.
 2. Open `/dashboard`.
@@ -163,7 +186,7 @@ Routes:
 11. Raise dispute from issue details.
 12. Open `/notifications` and verify notifications can be marked read/deleted.
 
-## 11. Admin Workflow Tests
+## 12. Admin Workflow Tests
 
 1. Login as admin.
 2. Open `/dashboard`.
@@ -172,7 +195,7 @@ Routes:
 5. Confirm admin data is platform-wide.
 6. Confirm no server errors appear when loading pages.
 
-## 12. API and Security Tests
+## 13. API and Security Tests
 
 Use browser behavior first, then optional API tools if available.
 
@@ -186,8 +209,34 @@ Use browser behavior first, then optional API tools if available.
 | Evidence upload over 10 MB | Rejected |
 | Unsupported evidence file type | Rejected |
 | External callback URL on login | Redirects safely to `/dashboard` or internal route |
+| Public contact API with invalid payload | Returns `400` with field validation errors |
+| Public contact API with valid payload | Returns `201` and stores a contact message |
 
-## 13. Screenshot Evidence
+## 14. Full Research Walkthrough
+
+Recommended order for research or stakeholder demonstration:
+
+1. Visit `/` and review landing page proposition.
+2. Open `/features`, `/about`, `/security`, `/privacy`, and `/terms`.
+3. Open `/contact` and submit a valid enquiry.
+4. Register a landlord account.
+5. Log in as landlord and review dashboard.
+6. Create a property.
+7. Create a tenancy for a tenant email.
+8. Log out.
+9. Register or log in as tenant.
+10. Open `/my-tenancy`.
+11. Create an issue.
+12. Confirm smart priority assignment.
+13. Upload evidence.
+14. Send a message about the issue.
+15. Raise a dispute from the issue.
+16. Log in as landlord and review the issue, message, dispute, and notifications.
+17. Update issue and dispute status.
+18. Review dashboard analytics updates.
+19. Capture screenshots listed in `docs/screenshot-checklist.md`.
+
+## 15. Screenshot Evidence
 
 Capture screenshots listed in `docs/screenshot-checklist.md`.
 
@@ -203,7 +252,7 @@ Example:
 chapter4/SS-005-landlord-dashboard.png
 ```
 
-## 14. Console and Network Checks
+## 16. Console and Network Checks
 
 For every major page:
 
@@ -219,7 +268,7 @@ Expected result:
 - no unexpected `500` API responses
 - no broken static assets
 
-## 15. Bug Report Template
+## 17. Bug Report Template
 
 Use this format when reporting issues:
 
@@ -250,7 +299,7 @@ Severity:
 Low / Medium / High / Critical
 ```
 
-## 16. Completion Criteria
+## 18. Completion Criteria
 
 Testing is complete when:
 

@@ -21,10 +21,15 @@ export type ApiSessionUser = {
 };
 
 export function unauthenticatedResponse() {
-  return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  return NextResponse.json(
+    { error: "Authentication is required." },
+    { status: 401 },
+  );
 }
 
-export function forbiddenResponse(message = "You are not authorized to access this resource.") {
+export function forbiddenResponse(
+  message = "You are not authorized to access this resource.",
+) {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
@@ -32,7 +37,9 @@ export function notFoundResponse(message = "Conversation not found.") {
   return NextResponse.json({ error: message }, { status: 404 });
 }
 
-export function validationErrorResponse(fieldErrors: Record<string, string[] | undefined>) {
+export function validationErrorResponse(
+  fieldErrors: Record<string, string[] | undefined>,
+) {
   return NextResponse.json(
     {
       error: "Validation failed.",
@@ -42,7 +49,10 @@ export function validationErrorResponse(fieldErrors: Record<string, string[] | u
   );
 }
 
-export async function findAccessibleConversation(id: string, user: ApiSessionUser) {
+export async function findAccessibleConversation(
+  id: string,
+  user: ApiSessionUser,
+) {
   if (!Types.ObjectId.isValid(id)) {
     return null;
   }
@@ -50,9 +60,7 @@ export async function findAccessibleConversation(id: string, user: ApiSessionUse
   await connectMongoDB();
 
   const query =
-    user.role === "admin"
-      ? { _id: id }
-      : { _id: id, participants: user.id };
+    user.role === "admin" ? { _id: id } : { _id: id, participants: user.id };
 
   return ConversationModel.findOne(query);
 }
@@ -103,7 +111,13 @@ export async function canSendMessage({
 
     if (sender.role === "tenant") {
       return (
-        (tenancy.tenantId === sender.id || tenancy.tenantEmail === sender.email.toLowerCase()) &&
+        (tenancy.tenantId === sender.id ||
+          tenancy.tenantEmail === sender.email.toLowerCase() ||
+          tenancy.additionalTenants?.some(
+            (tenant) =>
+              tenant.tenantId === sender.id ||
+              tenant.email === sender.email.toLowerCase(),
+          )) &&
         tenancy.landlordId === receiverId
       );
     }
@@ -116,7 +130,12 @@ export async function canSendMessage({
       sender.role === "tenant"
         ? {
             propertyId,
-            $or: [{ tenantId: sender.id }, { tenantEmail: sender.email.toLowerCase() }],
+            $or: [
+              { tenantId: sender.id },
+              { tenantEmail: sender.email.toLowerCase() },
+              { "additionalTenants.tenantId": sender.id },
+              { "additionalTenants.email": sender.email.toLowerCase() },
+            ],
             landlordId: receiverId,
           }
         : {
@@ -132,7 +151,12 @@ export async function canSendMessage({
   const tenancy = await TenancyModel.findOne(
     sender.role === "tenant"
       ? {
-          $or: [{ tenantId: sender.id }, { tenantEmail: sender.email.toLowerCase() }],
+          $or: [
+            { tenantId: sender.id },
+            { tenantEmail: sender.email.toLowerCase() },
+            { "additionalTenants.tenantId": sender.id },
+            { "additionalTenants.email": sender.email.toLowerCase() },
+          ],
           landlordId: receiverId,
         }
       : {
@@ -256,7 +280,9 @@ export async function serializeMessage(message: MessageDocument) {
 
 export async function serializeMessages(messages: MessageDocument[]) {
   const userIds = [
-    ...new Set(messages.flatMap((message) => [message.senderId, message.receiverId])),
+    ...new Set(
+      messages.flatMap((message) => [message.senderId, message.receiverId]),
+    ),
   ];
   const users = await UserModel.find({ _id: { $in: userIds } });
   const usersById = new Map(

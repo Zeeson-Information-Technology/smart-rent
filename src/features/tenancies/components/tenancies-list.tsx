@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { CalendarDays, Eye, Pencil, Plus, Users } from "lucide-react";
 import Link from "next/link";
 
-import { DataTable, EmptyState, LoadingState, StatCard } from "@/components/dashboard";
+import {
+  DataTable,
+  EmptyState,
+  LoadingState,
+  StatCard,
+} from "@/components/dashboard";
 import { Button } from "@/components/ui";
 import type { UserRole } from "@/types/database";
 import type { TenancyRecord } from "@/features/tenancies/types";
@@ -93,16 +98,24 @@ export function TenanciesList({ role }: TenanciesListProps) {
   return (
     <>
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard icon={Users} label="Total tenancies" value={tenancies.length.toString()} />
+        <StatCard
+          icon={Users}
+          label="Total tenancies"
+          value={tenancies.length.toString()}
+        />
         <StatCard
           icon={Users}
           label="Active tenancies"
-          value={tenancies.filter((tenancy) => tenancy.status === "active").length.toString()}
+          value={tenancies
+            .filter((tenancy) => tenancy.status === "active")
+            .length.toString()}
         />
         <StatCard
           icon={CalendarDays}
           label="Pending setup"
-          value={tenancies.filter((tenancy) => tenancy.status === "pending").length.toString()}
+          value={tenancies
+            .filter((tenancy) => tenancy.status === "pending")
+            .length.toString()}
         />
       </div>
       <DataTable
@@ -119,11 +132,25 @@ export function TenanciesList({ role }: TenanciesListProps) {
             ),
           },
           { header: "Email", render: (row) => row.tenantEmail },
-          { header: "Property", render: (row) => row.property?.propertyName ?? "Property unavailable" },
+          {
+            header: "Property",
+            render: (row) =>
+              row.property?.propertyName ?? "Property unavailable",
+          },
           { header: "Start Date", render: (row) => formatDate(row.startDate) },
-          { header: "End Date", render: (row) => row.endDate ? formatDate(row.endDate) : "Open-ended" },
-          { header: "Rent Amount", render: (row) => <RentAmountDisplay amount={row.rentAmount} /> },
-          { header: "Status", render: (row) => <TenancyStatusBadge status={row.status} /> },
+          {
+            header: "End Date",
+            render: (row) =>
+              row.endDate ? formatDate(row.endDate) : "Open-ended",
+          },
+          {
+            header: "Rent Amount",
+            render: (row) => <RentAmountDisplay amount={row.rentAmount} />,
+          },
+          {
+            header: "Status",
+            render: (row) => <TenancyStatusBadge status={row.status} />,
+          },
           {
             header: "Actions",
             render: (row) => (

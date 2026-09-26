@@ -1,16 +1,31 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { AlertCircle, CalendarDays, Home, Mail, Pencil, Scale, User } from "lucide-react";
+import {
+  AlertCircle,
+  CalendarDays,
+  Home,
+  Mail,
+  Pencil,
+  Scale,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 
-import { DataTable, EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/dashboard";
+import {
+  DataTable,
+  EmptyState,
+  PageHeader,
+  StatCard,
+  StatusBadge,
+} from "@/components/dashboard";
 import { Button, Card, CardContent, CardHeader } from "@/components/ui";
 import type { UserRole } from "@/types/database";
 import type { TenancyRecord } from "@/features/tenancies/types";
 
 import { DeleteTenancyButton } from "./delete-tenancy-button";
 import { RentAmountDisplay } from "./rent-amount-display";
+import { RentTracker } from "./rent-tracker";
 import { TenancyStatusBadge } from "./tenancy-status-badge";
 
 type TenancyDetailsProps = {
@@ -19,11 +34,19 @@ type TenancyDetailsProps = {
 };
 
 const placeholderIssues = [
-  { title: "Related issues will appear here", date: "Not connected yet", status: "Pending" as const },
+  {
+    title: "Related issues will appear here",
+    date: "Not connected yet",
+    status: "Pending" as const,
+  },
 ];
 
 const placeholderDisputes = [
-  { title: "Related disputes will appear here", date: "Not connected yet", status: "Draft" as const },
+  {
+    title: "Related disputes will appear here",
+    date: "Not connected yet",
+    status: "Draft" as const,
+  },
 ];
 
 export function TenancyDetails({ id, role }: TenancyDetailsProps) {
@@ -114,45 +137,112 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
       />
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
         <StatCard icon={User} label="Tenant" value={tenancy.tenantName} />
-        <StatCard icon={Home} label="Property" value={tenancy.property?.propertyName ?? "Unavailable"} />
-        <StatCard icon={CalendarDays} label="Ends" value={tenancy.endDate ? formatDate(tenancy.endDate) : "Open-ended"} />
+        <StatCard
+          icon={Home}
+          label="Property"
+          value={tenancy.property?.propertyName ?? "Unavailable"}
+        />
+        <StatCard
+          icon={CalendarDays}
+          label="Ends"
+          value={tenancy.endDate ? formatDate(tenancy.endDate) : "Open-ended"}
+        />
         <StatCard icon={Mail} label="Status" value={tenancy.status} />
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-slate-950">Tenant details</h2>
+            <h2 className="text-lg font-semibold text-slate-950">
+              Tenant details
+            </h2>
           </CardHeader>
           <CardContent className="grid gap-4 text-sm">
             <Detail label="Name" value={tenancy.tenantName} />
             <Detail label="Email" value={tenancy.tenantEmail} />
-            <Detail label="Linked account" value={tenancy.tenantId ? "Linked" : "Pending registration"} />
-            <Detail label="Status" value={<TenancyStatusBadge status={tenancy.status} />} />
+            <Detail
+              label="Contact number"
+              value={tenancy.tenantPhone || "Not provided"}
+            />
+            <Detail
+              label="Linked account"
+              value={tenancy.tenantId ? "Linked" : "Pending registration"}
+            />
+            <Detail
+              label="Status"
+              value={<TenancyStatusBadge status={tenancy.status} />}
+            />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-slate-950">Property details</h2>
+            <h2 className="text-lg font-semibold text-slate-950">
+              Property details
+            </h2>
           </CardHeader>
           <CardContent className="grid gap-4 text-sm">
-            <Detail label="Property" value={tenancy.property?.propertyName ?? "Unavailable"} />
-            <Detail label="Address" value={tenancy.property ? formatAddress(tenancy) : "Unavailable"} />
-            <Detail label="Type" value={tenancy.property?.propertyType ?? "Unavailable"} />
-            <Detail label="Property status" value={tenancy.property?.status ?? "Unavailable"} />
+            <Detail
+              label="Property"
+              value={tenancy.property?.propertyName ?? "Unavailable"}
+            />
+            <Detail
+              label="Address"
+              value={tenancy.property ? formatAddress(tenancy) : "Unavailable"}
+            />
+            <Detail
+              label="Type"
+              value={tenancy.property?.propertyType ?? "Unavailable"}
+            />
+            <Detail
+              label="Property status"
+              value={tenancy.property?.status ?? "Unavailable"}
+            />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-slate-950">Lease details</h2>
+            <h2 className="text-lg font-semibold text-slate-950">
+              Lease details
+            </h2>
           </CardHeader>
           <CardContent className="grid gap-4 text-sm">
             <Detail label="Start date" value={formatDate(tenancy.startDate)} />
-            <Detail label="End date" value={tenancy.endDate ? formatDate(tenancy.endDate) : "Open-ended"} />
-            <Detail label="Rent amount" value={<RentAmountDisplay amount={tenancy.rentAmount} />} />
+            <Detail
+              label="End date"
+              value={
+                tenancy.endDate ? formatDate(tenancy.endDate) : "Open-ended"
+              }
+            />
+            <Detail
+              label="Rent amount"
+              value={<RentAmountDisplay amount={tenancy.rentAmount} />}
+            />
             <Detail label="Created" value={formatDate(tenancy.createdAt)} />
           </CardContent>
         </Card>
       </div>
+      {tenancy.additionalTenants.length > 0 ? (
+        <Card className="mt-6">
+          <CardHeader>
+            <h2 className="text-lg font-semibold text-slate-950">
+              Additional tenants
+            </h2>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            {tenancy.additionalTenants.map((tenant) => (
+              <div className="rounded-xl border p-4" key={tenant.email}>
+                <p className="font-semibold text-slate-950">{tenant.name}</p>
+                <p className="mt-1 text-sm text-slate-600">{tenant.email}</p>
+                <p className="text-sm text-slate-600">{tenant.phone}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
+      <RentTracker
+        monthlyRent={tenancy.rentAmount}
+        role={role}
+        tenancyId={tenancy.id}
+      />
       <section className="mt-6">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-950">
           <AlertCircle className="h-5 w-5 text-blue-600" aria-hidden="true" />
@@ -160,9 +250,17 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
         </h2>
         <DataTable
           columns={[
-            { header: "Issue", render: (row) => <span className="font-medium text-slate-950">{row.title}</span> },
+            {
+              header: "Issue",
+              render: (row) => (
+                <span className="font-medium text-slate-950">{row.title}</span>
+              ),
+            },
             { header: "Date", render: (row) => row.date },
-            { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+            {
+              header: "Status",
+              render: (row) => <StatusBadge status={row.status} />,
+            },
           ]}
           rows={placeholderIssues}
         />
@@ -174,9 +272,17 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
         </h2>
         <DataTable
           columns={[
-            { header: "Dispute", render: (row) => <span className="font-medium text-slate-950">{row.title}</span> },
+            {
+              header: "Dispute",
+              render: (row) => (
+                <span className="font-medium text-slate-950">{row.title}</span>
+              ),
+            },
             { header: "Date", render: (row) => row.date },
-            { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+            {
+              header: "Status",
+              render: (row) => <StatusBadge status={row.status} />,
+            },
           ]}
           rows={placeholderDisputes}
         />

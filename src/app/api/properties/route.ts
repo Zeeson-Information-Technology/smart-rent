@@ -44,7 +44,9 @@ export async function POST(request: Request) {
   }
 
   if (!canManageProperties(session.user.role)) {
-    return forbiddenResponse("Only landlords and admins can create properties.");
+    return forbiddenResponse(
+      "Only landlords and admins can create properties.",
+    );
   }
 
   const body = await request.json().catch(() => null);
@@ -70,6 +72,7 @@ export async function POST(request: Request) {
     propertyType: parsedBody.data.propertyType,
     status: parsedBody.data.status,
     description: parsedBody.data.description,
+    bedroomCount: parsedBody.data.bedroomCount,
   });
 
   await createNotification({

@@ -90,15 +90,24 @@ export async function POST(request: Request) {
     $or: [
       { tenantId: session.user.id },
       { tenantEmail: session.user.email.toLowerCase() },
+      { "additionalTenants.tenantId": session.user.id },
+      { "additionalTenants.email": session.user.email.toLowerCase() },
     ],
   });
 
   if (!tenancy) {
-    return forbiddenResponse("You can only report issues for your assigned tenancy.");
+    return forbiddenResponse(
+      "You can only report issues for your assigned tenancy.",
+    );
   }
 
-  if (parsedBody.data.tenancyId && parsedBody.data.tenancyId !== tenancy._id.toString()) {
-    return forbiddenResponse("You can only report issues for your assigned tenancy.");
+  if (
+    parsedBody.data.tenancyId &&
+    parsedBody.data.tenancyId !== tenancy._id.toString()
+  ) {
+    return forbiddenResponse(
+      "You can only report issues for your assigned tenancy.",
+    );
   }
 
   const property = await PropertyModel.findOne({ _id: tenancy.propertyId });

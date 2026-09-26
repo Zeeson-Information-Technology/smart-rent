@@ -1,4 +1,10 @@
-import { Schema, model, models, type HydratedDocument, type Model } from "mongoose";
+import {
+  Schema,
+  model,
+  models,
+  type HydratedDocument,
+  type Model,
+} from "mongoose";
 
 import { TENANCY_STATUSES } from "@/constants";
 import type { Tenancy } from "@/types/database";
@@ -32,6 +38,30 @@ const tenancySchema = new Schema<TenancyDocument>(
       lowercase: true,
       trim: true,
       index: true,
+    },
+    tenantPhone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    additionalTenants: {
+      type: [
+        new Schema(
+          {
+            tenantId: { type: String, default: null },
+            name: { type: String, required: true, trim: true },
+            email: {
+              type: String,
+              required: true,
+              lowercase: true,
+              trim: true,
+            },
+            phone: { type: String, required: true, trim: true },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
     },
     startDate: {
       type: Date,

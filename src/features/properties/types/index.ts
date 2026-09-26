@@ -10,6 +10,7 @@ export type PropertyRecord = {
   propertyType: PropertyType;
   status: PropertyStatus;
   description: string;
+  bedroomCount: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -23,4 +24,5 @@ export type PropertyFormValues = {
   propertyType: PropertyType;
   status: PropertyStatus;
   description: string;
+  bedroomCount: string;
 };

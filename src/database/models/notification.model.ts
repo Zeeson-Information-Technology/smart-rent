@@ -1,4 +1,10 @@
-import { Schema, model, models, type HydratedDocument, type Model } from "mongoose";
+import {
+  Schema,
+  model,
+  models,
+  type HydratedDocument,
+  type Model,
+} from "mongoose";
 
 import {
   NOTIFICATION_RELATED_ENTITY_TYPES,

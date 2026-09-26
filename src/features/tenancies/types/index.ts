@@ -1,4 +1,8 @@
-import type { PropertyStatus, PropertyType, TenancyStatus } from "@/types/database";
+import type {
+  PropertyStatus,
+  PropertyType,
+  TenancyStatus,
+} from "@/types/database";
 
 export type TenancyPropertySummary = {
   id: string;
@@ -17,6 +21,13 @@ export type TenancyRecord = {
   tenantId?: string | null;
   tenantName: string;
   tenantEmail: string;
+  tenantPhone: string;
+  additionalTenants: Array<{
+    tenantId?: string | null;
+    name: string;
+    email: string;
+    phone: string;
+  }>;
   startDate: string;
   endDate: string | null;
   rentAmount: number;
@@ -30,6 +41,8 @@ export type TenancyFormValues = {
   propertyId: string;
   tenantName: string;
   tenantEmail: string;
+  tenantPhone: string;
+  additionalTenants: Array<{ name: string; email: string; phone: string }>;
   startDate: string;
   endDate: string;
   rentAmount: string;

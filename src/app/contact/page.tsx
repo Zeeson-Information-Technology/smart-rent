@@ -3,7 +3,8 @@ import { Mail, MapPin, Phone } from "lucide-react";
 
 import { Footer, PageHero, SectionWrapper } from "@/components/marketing";
 import { PublicNavbar } from "@/components/navigation";
-import { Badge, Button, Card, CardContent, CardHeader, Input } from "@/components/ui";
+import { Badge, Card, CardContent, CardHeader } from "@/components/ui";
+import { ContactForm } from "@/features/contact/components/contact-form";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -15,7 +16,13 @@ const contactItems = [
   {
     icon: MapPin,
     title: "Office",
-    lines: ["SmartRent", "123 Canary Wharf", "London", "E14 5AB", "United Kingdom"],
+    lines: [
+      "SmartRent",
+      "123 Canary Wharf",
+      "London",
+      "E14 5AB",
+      "United Kingdom",
+    ],
   },
   {
     icon: Mail,
@@ -52,8 +59,14 @@ export default function ContactPage() {
                   const Icon = item.icon;
 
                   return (
-                    <div className="flex gap-3 rounded-xl border bg-slate-50 p-4" key={item.title}>
-                      <Icon className="mt-1 h-5 w-5 text-blue-600" aria-hidden="true" />
+                    <div
+                      className="flex gap-3 rounded-xl border bg-slate-50 p-4"
+                      key={item.title}
+                    >
+                      <Icon
+                        className="mt-1 h-5 w-5 text-blue-600"
+                        aria-hidden="true"
+                      />
                       <div>
                         <p className="font-medium text-slate-950">{item.title}</p>
                         <div className="mt-1 text-sm leading-6 text-slate-600">
@@ -78,26 +91,12 @@ export default function ContactPage() {
                   Send a message
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  This static form is a frontend placeholder and does not submit data yet.
+                  Send a message to the SmartRent team. Your enquiry is stored
+                  securely for follow-up.
                 </p>
               </CardHeader>
               <CardContent>
-                <form className="grid gap-4">
-                  <Input label="Name" name="name" placeholder="Alex Morgan" type="text" />
-                  <Input label="Email" name="email" placeholder="you@example.com" type="email" />
-                  <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="message">
-                    Message
-                    <textarea
-                      className="min-h-32 rounded-lg border bg-white px-3 py-3 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-blue-100"
-                      id="message"
-                      name="message"
-                      placeholder="Tell us what you would like to discuss"
-                    />
-                  </label>
-                  <Button className="w-full sm:w-fit" type="button">
-                    Send message
-                  </Button>
-                </form>
+                <ContactForm />
               </CardContent>
             </Card>
           </div>

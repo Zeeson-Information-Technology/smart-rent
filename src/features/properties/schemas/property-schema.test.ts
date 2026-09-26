@@ -10,6 +10,7 @@ const validProperty = {
   propertyType: "Apartment",
   status: "active",
   description: "Two-bedroom apartment with concierge access.",
+  bedroomCount: 2,
 };
 
 describe("propertySchema", () => {
@@ -53,9 +54,20 @@ describe("propertySchema", () => {
     if (!result.success) {
       const fieldErrors = result.error.flatten().fieldErrors;
 
-      expect(fieldErrors.propertyType).toContain("Select a valid property type");
+      expect(fieldErrors.propertyType).toContain(
+        "Select a valid property type",
+      );
       expect(fieldErrors.status).toContain("Select a valid property status");
     }
+  });
+
+  it("rejects an invalid bedroom count", () => {
+    const result = propertySchema.safeParse({
+      ...validProperty,
+      bedroomCount: -1,
+    });
+
+    expect(result.success).toBe(false);
   });
 });
 

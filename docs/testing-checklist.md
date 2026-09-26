@@ -34,3 +34,12 @@ Use this checklist during final QA and Chapter 4 evidence collection. Record the
 | QA-028 | Dashboard | Admin dashboard real counts | User, landlord, tenant, property, tenancy, issue, and dispute totals reflect database records | Pending | Pending |
 | QA-029 | Security | Landlord requests another landlord property API record | API returns `403` or `404`; no private data is exposed | Pending | Pending |
 | QA-030 | Public Website | Navigate all public nav/footer links | Every public page loads with no broken links or layout failures | Pending | Pending |
+| QA-031 | Contact | Submit contact form with valid name, email, and message | Message is saved through `/api/contact` and success message is shown | Pending | Pending |
+| QA-032 | Contact | Submit contact form with invalid email or short message | Form shows clear validation errors and does not save invalid data | Pending | Pending |
+| QA-033 | Joint Tenancy | Create a tenancy with a primary tenant and two additional tenants | Tenancy saves all names, emails, and contact numbers and displays them on tenancy details | Pending | Pending |
+| QA-034 | Joint Tenancy | Register or log in using an additional tenant email and open `/my-tenancy` | Joint tenant can view the shared tenancy and property | Pending | Pending |
+| QA-035 | Properties | Create and edit a property with a bedroom count | Bedroom count persists and appears on property details | Pending | Pending |
+| QA-036 | Inventory | Add and delete an inventory item with an image, condition, quantity, and notes | Item and image persist; confirmed deletion removes both | Pending | Pending |
+| QA-037 | Rent Tracking | Save an unpaid or partial rent period and then update the same due date | Status and outstanding balance are correct; the existing period updates without duplication | Pending | Pending |
+| QA-038 | Tenant Contacts | Save primary and additional tenant telephone numbers | Contact numbers persist on tenancy details and edit forms | Pending | Pending |
+| QA-039 | Profile | Open profile as landlord and tenant | Name, email, and role match the authenticated session; no hard-coded role is displayed | Pending | Pending |

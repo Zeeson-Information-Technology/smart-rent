@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { Building2, Eye, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 
-import { DataTable, EmptyState, LoadingState, StatCard } from "@/components/dashboard";
+import {
+  DataTable,
+  EmptyState,
+  LoadingState,
+  StatCard,
+} from "@/components/dashboard";
 import { Button } from "@/components/ui";
 import type { PropertyRecord } from "@/features/properties/types";
 
@@ -85,11 +90,17 @@ export function PropertiesList() {
   return (
     <>
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard icon={Building2} label="Managed properties" value={properties.length.toString()} />
+        <StatCard
+          icon={Building2}
+          label="Managed properties"
+          value={properties.length.toString()}
+        />
         <StatCard
           icon={Building2}
           label="Active properties"
-          value={properties.filter((property) => property.status === "active").length.toString()}
+          value={properties
+            .filter((property) => property.status === "active")
+            .length.toString()}
         />
         <StatCard
           icon={Building2}
@@ -113,9 +124,20 @@ export function PropertiesList() {
             ),
           },
           { header: "Address", render: (row) => formatAddress(row) },
-          { header: "Type", render: (row) => <PropertyTypeBadge propertyType={row.propertyType} /> },
-          { header: "Status", render: (row) => <PropertyStatusBadge status={row.status} /> },
-          { header: "Created Date", render: (row) => formatDate(row.createdAt) },
+          {
+            header: "Type",
+            render: (row) => (
+              <PropertyTypeBadge propertyType={row.propertyType} />
+            ),
+          },
+          {
+            header: "Status",
+            render: (row) => <PropertyStatusBadge status={row.status} />,
+          },
+          {
+            header: "Created Date",
+            render: (row) => formatDate(row.createdAt),
+          },
           {
             header: "Actions",
             render: (row) => (
