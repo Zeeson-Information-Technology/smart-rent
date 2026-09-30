@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 
-import { DisputeModel, IssueModel, UserModel } from "@/database/models";
+import {
+  DisputeModel,
+  IssueModel,
+  TenancyModel,
+  UserModel,
+} from "@/database/models";
 import { getCloudinaryClient } from "@/lib/cloudinary";
 import { connectMongoDB } from "@/lib/mongodb";
-import type { DisputeDocument, EvidenceDocument, IssueDocument } from "@/database/models";
+import type {
+  DisputeDocument,
+  EvidenceDocument,
+  IssueDocument,
+} from "@/database/models";
 import type { EvidenceType, UserRole } from "@/types/database";
+import { tenantBelongsToTenancy } from "@/lib/tenancy-access";
 
 export const MAX_EVIDENCE_FILE_SIZE = 10 * 1024 * 1024;
 
 type ApiSessionUser = {
+  email: string;
   id: string;
   role: UserRole;
 };
@@ -23,10 +34,15 @@ type ValidatedEvidenceFile = {
 };
 
 export function unauthenticatedResponse() {
-  return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  return NextResponse.json(
+    { error: "Authentication is required." },
+    { status: 401 },
+  );
 }
 
-export function forbiddenResponse(message = "You are not authorized to access this resource.") {
+export function forbiddenResponse(
+  message = "You are not authorized to access this resource.",
+) {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
@@ -38,7 +54,10 @@ export function badRequestResponse(message: string) {
   return NextResponse.json({ error: message }, { status: 400 });
 }
 
-export async function findAccessibleIssue(issueId: string, user: ApiSessionUser) {
+export async function findAccessibleIssue(
+  issueId: string,
+  user: ApiSessionUser,
+) {
   if (!Types.ObjectId.isValid(issueId)) {
     return null;
   }
@@ -51,14 +70,17 @@ export async function findAccessibleIssue(issueId: string, user: ApiSessionUser)
     return null;
   }
 
-  if (!canAccessIssue(issue, user)) {
+  if (!(await canAccessIssue(issue, user))) {
     return null;
   }
 
   return issue;
 }
 
-export async function findAccessibleDispute(disputeId: string, user: ApiSessionUser) {
+export async function findAccessibleDispute(
+  disputeId: string,
+  user: ApiSessionUser,
+) {
   if (!Types.ObjectId.isValid(disputeId)) {
     return null;
   }
@@ -75,19 +97,31 @@ export async function findAccessibleDispute(disputeId: string, user: ApiSessionU
   }
 
   if (user.role === "tenant") {
-    return dispute.tenantId === user.id || dispute.raisedBy === user.id ? dispute : null;
+    if (dispute.tenantId === user.id || dispute.raisedBy === user.id)
+      return dispute;
+    const tenancy = dispute.tenancyId
+      ? await TenancyModel.findById(dispute.tenancyId)
+      : null;
+    return tenancy && tenantBelongsToTenancy(tenancy, user) ? dispute : null;
   }
 
   return dispute.landlordId === user.id ? dispute : null;
 }
 
-export function canAccessIssue(issue: IssueDocument, user: ApiSessionUser) {
+export async function canAccessIssue(
+  issue: IssueDocument,
+  user: ApiSessionUser,
+) {
   if (user.role === "admin") {
     return true;
   }
 
   if (user.role === "tenant") {
-    return issue.tenantId === user.id;
+    if (issue.tenantId === user.id) return true;
+    const tenancy = issue.tenancyId
+      ? await TenancyModel.findById(issue.tenancyId)
+      : null;
+    return tenancy ? tenantBelongsToTenancy(tenancy, user) : false;
   }
 
   return issue.landlordId === user.id;
@@ -105,7 +139,9 @@ export function canDeleteEvidence(
   );
 }
 
-export async function validateEvidenceFile(file: File): Promise<ValidatedEvidenceFile> {
+export async function validateEvidenceFile(
+  file: File,
+): Promise<ValidatedEvidenceFile> {
   if (file.size > MAX_EVIDENCE_FILE_SIZE) {
     throw new Error("File size must be 10 MB or less.");
   }
@@ -115,7 +151,9 @@ export async function validateEvidenceFile(file: File): Promise<ValidatedEvidenc
   const detected = detectFileType(buffer);
 
   if (!detected) {
-    throw new Error("Unsupported file type. Upload JPG, JPEG, PNG, WEBP, or PDF files.");
+    throw new Error(
+      "Unsupported file type. Upload JPG, JPEG, PNG, WEBP, or PDF files.",
+    );
   }
 
   return {
@@ -163,7 +201,9 @@ export async function serializeEvidence(evidence: EvidenceDocument) {
 }
 
 export async function serializeEvidenceList(evidenceItems: EvidenceDocument[]) {
-  const uploaderIds = [...new Set(evidenceItems.map((item) => item.uploadedBy))];
+  const uploaderIds = [
+    ...new Set(evidenceItems.map((item) => item.uploadedBy)),
+  ];
   const uploaders = await UserModel.find({ _id: { $in: uploaderIds } });
   const uploadersById = new Map(
     uploaders.map((uploader) => [uploader._id.toString(), uploader.name]),
@@ -184,7 +224,9 @@ export async function serializeEvidenceList(evidenceItems: EvidenceDocument[]) {
   }));
 }
 
-function detectFileType(buffer: Buffer): { fileType: EvidenceType; mimeType: string } | null {
+function detectFileType(
+  buffer: Buffer,
+): { fileType: EvidenceType; mimeType: string } | null {
   if (buffer.length < 12) {
     return null;
   }

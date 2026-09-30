@@ -29,6 +29,7 @@ const defaultValues: TenancyFormValues = {
   startDate: "",
   endDate: "",
   rentAmount: "",
+  depositAmount: "",
   status: "pending",
 };
 
@@ -48,6 +49,7 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
           startDate: toDateInputValue(tenancy.startDate),
           endDate: tenancy.endDate ? toDateInputValue(tenancy.endDate) : "",
           rentAmount: String(tenancy.rentAmount),
+          depositAmount: String(tenancy.depositAmount),
           status: tenancy.status,
         }
       : defaultValues,
@@ -311,7 +313,7 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
             </FieldError>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <FieldError errors={fieldErrors.rentAmount}>
               <Input
                 label="Rent amount"
@@ -323,6 +325,20 @@ export function TenancyForm({ mode, tenancy }: TenancyFormProps) {
                 placeholder="2450"
                 type="number"
                 value={values.rentAmount}
+              />
+            </FieldError>
+            <FieldError errors={fieldErrors.depositAmount}>
+              <Input
+                label="Refundable tenancy deposit"
+                min="0"
+                name="depositAmount"
+                onChange={(event) =>
+                  updateValue("depositAmount", event.target.value)
+                }
+                placeholder="1250"
+                step="0.01"
+                type="number"
+                value={values.depositAmount}
               />
             </FieldError>
             <FieldError errors={fieldErrors.status}>

@@ -20,6 +20,9 @@ export const tenancySchema = z.object({
   rentAmount: z.coerce
     .number({ invalid_type_error: "Rent amount is required" })
     .positive("Rent amount must be greater than 0"),
+  depositAmount: z.coerce
+    .number({ invalid_type_error: "Deposit amount is required" })
+    .min(0, "Deposit amount cannot be negative"),
   status: z.enum(TENANCY_STATUSES, {
     errorMap: () => ({ message: "Select a valid tenancy status" }),
   }),
@@ -35,6 +38,7 @@ export const updateTenancySchema = tenancySchema.partial({
   startDate: true,
   endDate: true,
   rentAmount: true,
+  depositAmount: true,
   status: true,
 });
 

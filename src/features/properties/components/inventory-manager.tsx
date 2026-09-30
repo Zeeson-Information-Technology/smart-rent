@@ -22,15 +22,34 @@ type Item = {
   quantity: number;
   notes: string;
   imageUrl: string | null;
+  acknowledgements: Array<{
+    id: string;
+    tenantId: string;
+    tenantName: string;
+    status: "confirmed" | "disputed";
+    note: string;
+    confirmedAt: string;
+  }>;
 };
 
-export function InventoryManager({ propertyId }: { propertyId: string }) {
+export function InventoryManager({
+  canManage = true,
+  propertyId,
+}: {
+  canManage?: boolean;
+  propertyId: string;
+}) {
   const [items, setItems] = useState<Item[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [tenancyId, setTenancyId] = useState<string | null>(null);
+  const [acknowledgementNotes, setAcknowledgementNotes] = useState<
+    Record<string, string>
+  >({});
+  const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
   const load = useCallback(async () => {
     const response = await fetch(`/api/properties/${propertyId}/inventory`, {
       cache: "no-store",
@@ -38,6 +57,7 @@ export function InventoryManager({ propertyId }: { propertyId: string }) {
     const result = await response.json().catch(() => null);
     if (response.ok) {
       setItems(result.items ?? []);
+      setTenancyId(result.tenancyId ?? null);
     } else {
       setMessage(result?.error ?? "Unable to load inventory.");
     }
@@ -81,6 +101,28 @@ export function InventoryManager({ propertyId }: { propertyId: string }) {
     setIsDeleting(false);
   }
 
+  async function acknowledge(itemId: string, status: "confirmed" | "disputed") {
+    if (!tenancyId) return;
+    setAcknowledgingId(itemId);
+    setMessage(null);
+    const response = await fetch(`/api/inventory/${itemId}/acknowledgement`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tenancyId,
+        status,
+        note: acknowledgementNotes[itemId] ?? "",
+      }),
+    });
+    const result = await response.json().catch(() => null);
+    if (response.ok) {
+      await load();
+    } else {
+      setMessage(result?.error ?? "Unable to save your inventory response.");
+    }
+    setAcknowledgingId(null);
+  }
+
   return (
     <>
       <Card className="mt-6 min-w-0 overflow-hidden">
@@ -99,76 +141,78 @@ export function InventoryManager({ propertyId }: { propertyId: string }) {
               {message}
             </p>
           ) : null}
-          <form
-            className="grid min-w-0 gap-3 rounded-xl border bg-slate-50 p-4 md:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_minmax(0,1.4fr)]"
-            onSubmit={submit}
-          >
-            <Input
-              label="Item"
-              name="name"
-              placeholder="Washing machine"
-              required
-            />
-            <Input
-              label="Category"
-              name="category"
-              placeholder="Appliance"
-              required
-            />
-            <label className="grid gap-2 text-sm font-medium text-slate-700">
-              Condition
-              <select
-                className="h-11 rounded-lg border bg-white px-3 capitalize"
-                name="condition"
-              >
-                {INVENTORY_CONDITIONS.map((condition) => (
-                  <option key={condition}>{condition}</option>
-                ))}
-              </select>
-            </label>
-            <Input
-              defaultValue="1"
-              label="Quantity"
-              min="1"
-              name="quantity"
-              required
-              type="number"
-            />
-            <label className="grid min-w-0 gap-2 text-sm font-medium text-slate-700">
-              Image (optional)
-              <span className="flex h-11 min-w-0 items-center gap-2 overflow-hidden rounded-lg border bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:ring-4 focus-within:ring-blue-100">
-                <Upload
-                  className="h-4 w-4 shrink-0 text-blue-600"
-                  aria-hidden="true"
-                />
-                <span className="shrink-0 font-medium text-blue-700">
-                  Choose image
+          {canManage ? (
+            <form
+              className="grid min-w-0 gap-3 rounded-xl border bg-slate-50 p-4 md:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_minmax(0,1.4fr)]"
+              onSubmit={submit}
+            >
+              <Input
+                label="Item"
+                name="name"
+                placeholder="Washing machine"
+                required
+              />
+              <Input
+                label="Category"
+                name="category"
+                placeholder="Appliance"
+                required
+              />
+              <label className="grid gap-2 text-sm font-medium text-slate-700">
+                Condition
+                <select
+                  className="h-11 rounded-lg border bg-white px-3 capitalize"
+                  name="condition"
+                >
+                  {INVENTORY_CONDITIONS.map((condition) => (
+                    <option key={condition}>{condition}</option>
+                  ))}
+                </select>
+              </label>
+              <Input
+                defaultValue="1"
+                label="Quantity"
+                min="1"
+                name="quantity"
+                required
+                type="number"
+              />
+              <label className="grid min-w-0 gap-2 text-sm font-medium text-slate-700">
+                Image (optional)
+                <span className="flex h-11 min-w-0 items-center gap-2 overflow-hidden rounded-lg border bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:ring-4 focus-within:ring-blue-100">
+                  <Upload
+                    className="h-4 w-4 shrink-0 text-blue-600"
+                    aria-hidden="true"
+                  />
+                  <span className="shrink-0 font-medium text-blue-700">
+                    Choose image
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-slate-500">
+                    {selectedFileName || "No file selected"}
+                  </span>
+                  <input
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    name="image"
+                    onChange={(event) =>
+                      setSelectedFileName(event.target.files?.[0]?.name ?? "")
+                    }
+                    type="file"
+                  />
                 </span>
-                <span className="min-w-0 flex-1 truncate text-slate-500">
-                  {selectedFileName || "No file selected"}
-                </span>
-                <input
-                  accept="image/jpeg,image/png,image/webp"
-                  className="sr-only"
-                  name="image"
-                  onChange={(event) =>
-                    setSelectedFileName(event.target.files?.[0]?.name ?? "")
-                  }
-                  type="file"
-                />
-              </span>
-            </label>
-            <Input
-              className="md:col-span-2 lg:col-span-4"
-              label="Notes"
-              name="notes"
-              placeholder="Condition notes or serial number"
-            />
-            <Button className="self-end" disabled={busy} type="submit">
-              <Plus className="h-4 w-4" />
-              {busy ? "Adding..." : "Add item"}
-            </Button>
-          </form>
+              </label>
+              <Input
+                className="md:col-span-2 lg:col-span-4"
+                label="Notes"
+                name="notes"
+                placeholder="Condition notes or serial number"
+              />
+              <Button className="self-end" disabled={busy} type="submit">
+                <Plus className="h-4 w-4" />
+                {busy ? "Adding..." : "Add item"}
+              </Button>
+            </form>
+          ) : null}
           {items.length === 0 ? (
             <p className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">
               No inventory items recorded yet.
@@ -209,28 +253,88 @@ export function InventoryManager({ propertyId }: { propertyId: string }) {
                         </p>
                       ) : null}
                     </div>
-                    <Button
-                      aria-label={`Delete ${item.name}`}
-                      className="h-9 w-9 px-0"
-                      onClick={() => setDeleteTarget(item)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {canManage ? (
+                      <Button
+                        aria-label={`Delete ${item.name}`}
+                        className="h-9 w-9 px-0"
+                        onClick={() => setDeleteTarget(item)}
+                        size="sm"
+                        variant="outline"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    ) : null}
                   </div>
+                  {item.acknowledgements.length > 0 ? (
+                    <div className="border-t bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase text-slate-500">
+                        Tenant responses
+                      </p>
+                      <div className="mt-2 grid gap-1">
+                        {item.acknowledgements.map((entry) => (
+                          <p className="text-sm text-slate-700" key={entry.id}>
+                            <span className="font-medium">
+                              {entry.tenantName}
+                            </span>
+                            :{" "}
+                            {entry.status === "confirmed"
+                              ? "Condition confirmed"
+                              : "Condition differs"}
+                            {entry.note ? ` - ${entry.note}` : ""}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {!canManage && tenancyId ? (
+                    <div className="grid gap-3 border-t p-4">
+                      <label className="grid gap-2 text-sm font-medium text-slate-700">
+                        Condition note (optional)
+                        <input
+                          className="h-10 min-w-0 rounded-lg border px-3 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-blue-100"
+                          onChange={(event) =>
+                            setAcknowledgementNotes((current) => ({
+                              ...current,
+                              [item.id]: event.target.value,
+                            }))
+                          }
+                          placeholder="Note any difference from the recorded condition"
+                          value={acknowledgementNotes[item.id] ?? ""}
+                        />
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          disabled={acknowledgingId === item.id}
+                          onClick={() => void acknowledge(item.id, "confirmed")}
+                          size="sm"
+                        >
+                          Confirm condition
+                        </Button>
+                        <Button
+                          disabled={acknowledgingId === item.id}
+                          onClick={() => void acknowledge(item.id, "disputed")}
+                          size="sm"
+                          variant="outline"
+                        >
+                          Condition differs
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </div>
           )}
         </CardContent>
       </Card>
-      <InventoryDeleteDialog
-        busy={isDeleting}
-        item={deleteTarget}
-        onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => void remove()}
-      />
+      {canManage ? (
+        <InventoryDeleteDialog
+          busy={isDeleting}
+          item={deleteTarget}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={() => void remove()}
+        />
+      ) : null}
     </>
   );
 }

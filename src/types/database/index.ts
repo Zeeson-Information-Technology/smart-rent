@@ -12,6 +12,7 @@ export type {
   IssueStatus,
   InventoryCondition,
   InventoryItem,
+  InventoryAcknowledgement,
   Message,
   MessageStatus,
   Notification,

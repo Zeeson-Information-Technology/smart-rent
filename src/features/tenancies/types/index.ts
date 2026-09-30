@@ -31,6 +31,7 @@ export type TenancyRecord = {
   startDate: string;
   endDate: string | null;
   rentAmount: number;
+  depositAmount: number;
   status: TenancyStatus;
   property: TenancyPropertySummary | null;
   createdAt: string;
@@ -46,5 +47,6 @@ export type TenancyFormValues = {
   startDate: string;
   endDate: string;
   rentAmount: string;
+  depositAmount: string;
   status: TenancyStatus;
 };

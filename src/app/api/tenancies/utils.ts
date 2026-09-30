@@ -120,6 +120,7 @@ export function serializeTenancy(
     startDate: tenancy.startDate.toISOString(),
     endDate: tenancy.endDate?.toISOString() ?? null,
     rentAmount: tenancy.rentAmount,
+    depositAmount: tenancy.depositAmount ?? 0,
     status: tenancy.status,
     property: property ?? null,
     createdAt: tenancy.createdAt.toISOString(),

@@ -75,6 +75,12 @@ const tenancySchema = new Schema<TenancyDocument>(
       required: true,
       min: 0,
     },
+    depositAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
     status: {
       type: String,
       enum: TENANCY_STATUSES,

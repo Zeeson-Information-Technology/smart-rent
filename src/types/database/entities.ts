@@ -80,7 +80,18 @@ export interface Tenancy extends BaseEntity {
   startDate: Date;
   endDate?: Date;
   rentAmount: number;
+  depositAmount: number;
   status: TenancyStatus;
+}
+
+export interface InventoryAcknowledgement extends BaseEntity {
+  inventoryItemId: string;
+  tenancyId: string;
+  propertyId: string;
+  tenantId: string;
+  status: "confirmed" | "disputed";
+  note?: string;
+  confirmedAt: Date;
 }
 
 export interface InventoryItem extends BaseEntity {

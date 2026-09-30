@@ -10,6 +10,10 @@ export { DisputeModel, type DisputeDocument } from "./dispute.model";
 export { EvidenceModel, type EvidenceDocument } from "./evidence.model";
 export { IssueModel, type IssueDocument } from "./issue.model";
 export {
+  InventoryAcknowledgementModel,
+  type InventoryAcknowledgementDocument,
+} from "./inventory-acknowledgement.model";
+export {
   InventoryItemModel,
   type InventoryItemDocument,
 } from "./inventory-item.model";

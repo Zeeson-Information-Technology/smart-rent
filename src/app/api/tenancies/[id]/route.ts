@@ -134,6 +134,10 @@ export async function PUT(request: Request, context: TenancyRouteContext) {
     tenancy.rentAmount = parsedBody.data.rentAmount;
   }
 
+  if (parsedBody.data.depositAmount !== undefined) {
+    tenancy.depositAmount = parsedBody.data.depositAmount;
+  }
+
   if (parsedBody.data.status !== undefined) {
     tenancy.status = parsedBody.data.status;
   }

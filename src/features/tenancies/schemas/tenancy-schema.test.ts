@@ -13,6 +13,7 @@ const validTenancy = {
   startDate: "2026-09-01",
   endDate: "",
   rentAmount: 1800,
+  depositAmount: 1800,
   status: "active",
 };
 
@@ -27,6 +28,15 @@ describe("tenancySchema", () => {
       additionalTenants: [
         { name: "Sam Morgan", email: "invalid", phone: "1234567" },
       ],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a negative tenancy deposit", () => {
+    const result = tenancySchema.safeParse({
+      ...validTenancy,
+      depositAmount: -1,
     });
 
     expect(result.success).toBe(false);

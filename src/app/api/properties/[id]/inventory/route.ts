@@ -3,10 +3,15 @@ import { z } from "zod";
 
 import { auth } from "@/auth";
 import { INVENTORY_CONDITIONS } from "@/constants";
-import { InventoryItemModel } from "@/database/models";
+import {
+  InventoryAcknowledgementModel,
+  InventoryItemModel,
+  UserModel,
+} from "@/database/models";
 import { getCloudinaryClient } from "@/lib/cloudinary";
 import { connectMongoDB } from "@/lib/mongodb";
 import { findAccessibleProperty } from "@/app/api/properties/utils";
+import { findTenantTenancyForProperty } from "@/lib/tenancy-access";
 
 export const runtime = "nodejs";
 
@@ -29,14 +34,46 @@ export async function GET(_request: Request, { params }: Context) {
     );
 
   const { id } = await params;
-  const property = await findAccessibleProperty(id, session.user);
-  if (!property)
+  const property =
+    session.user.role === "tenant"
+      ? null
+      : await findAccessibleProperty(id, session.user);
+  const tenancy =
+    session.user.role === "tenant"
+      ? await findTenantTenancyForProperty(id, session.user)
+      : null;
+
+  if (!property && !tenancy)
     return NextResponse.json({ error: "Property not found." }, { status: 404 });
 
   const items = await InventoryItemModel.find({ propertyId: id }).sort({
     createdAt: -1,
   });
-  return NextResponse.json({ items: items.map(serializeItem) });
+  const acknowledgements = await InventoryAcknowledgementModel.find({
+    inventoryItemId: { $in: items.map((item) => item._id.toString()) },
+    ...(tenancy ? { tenancyId: tenancy._id.toString() } : {}),
+  });
+  const users = await UserModel.find({
+    _id: { $in: acknowledgements.map((item) => item.tenantId) },
+  }).select("name");
+  const names = new Map(users.map((user) => [user._id.toString(), user.name]));
+
+  return NextResponse.json({
+    tenancyId: tenancy?._id.toString() ?? null,
+    items: items.map((item) => ({
+      ...serializeItem(item),
+      acknowledgements: acknowledgements
+        .filter((entry) => entry.inventoryItemId === item._id.toString())
+        .map((entry) => ({
+          id: entry._id.toString(),
+          tenantId: entry.tenantId,
+          tenantName: names.get(entry.tenantId) ?? "Tenant",
+          status: entry.status,
+          note: entry.note ?? "",
+          confirmedAt: entry.confirmedAt.toISOString(),
+        })),
+    })),
+  });
 }
 
 export async function POST(request: Request, { params }: Context) {

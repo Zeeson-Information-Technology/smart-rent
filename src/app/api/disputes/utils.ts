@@ -11,17 +11,24 @@ import {
 } from "@/database/models";
 import { connectMongoDB } from "@/lib/mongodb";
 import type { UserRole } from "@/types/database";
+import { tenantBelongsToTenancy } from "@/lib/tenancy-access";
 
 export type ApiSessionUser = {
+  email: string;
   id: string;
   role: UserRole;
 };
 
 export function unauthenticatedResponse() {
-  return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  return NextResponse.json(
+    { error: "Authentication is required." },
+    { status: 401 },
+  );
 }
 
-export function forbiddenResponse(message = "You are not authorized to access this resource.") {
+export function forbiddenResponse(
+  message = "You are not authorized to access this resource.",
+) {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
@@ -29,8 +36,13 @@ export function notFoundResponse() {
   return NextResponse.json({ error: "Dispute not found." }, { status: 404 });
 }
 
-export function validationErrorResponse(fieldErrors: Record<string, string[] | undefined>) {
-  return NextResponse.json({ error: "Validation failed.", fieldErrors }, { status: 400 });
+export function validationErrorResponse(
+  fieldErrors: Record<string, string[] | undefined>,
+) {
+  return NextResponse.json(
+    { error: "Validation failed.", fieldErrors },
+    { status: 400 },
+  );
 }
 
 export async function generateDisputeReference() {
@@ -42,9 +54,18 @@ export async function generateDisputeReference() {
   return `DIS-${year}-${String(count + 1).padStart(4, "0")}`;
 }
 
-export function canAccessDispute(dispute: DisputeDocument, user: ApiSessionUser) {
+export async function canAccessDispute(
+  dispute: DisputeDocument,
+  user: ApiSessionUser,
+) {
   if (user.role === "admin") return true;
-  if (user.role === "tenant") return dispute.tenantId === user.id || dispute.raisedBy === user.id;
+  if (user.role === "tenant") {
+    if (dispute.tenantId === user.id || dispute.raisedBy === user.id)
+      return true;
+    if (!dispute.tenancyId) return false;
+    const tenancy = await TenancyModel.findById(dispute.tenancyId);
+    return tenancy ? tenantBelongsToTenancy(tenancy, user) : false;
+  }
   return dispute.landlordId === user.id;
 }
 
@@ -52,7 +73,7 @@ export async function findAccessibleDispute(id: string, user: ApiSessionUser) {
   if (!Types.ObjectId.isValid(id)) return null;
   await connectMongoDB();
   const dispute = await DisputeModel.findOne({ _id: id });
-  if (!dispute || !canAccessDispute(dispute, user)) return null;
+  if (!dispute || !(await canAccessDispute(dispute, user))) return null;
   return dispute;
 }
 

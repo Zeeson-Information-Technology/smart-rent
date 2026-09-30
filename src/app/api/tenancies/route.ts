@@ -113,6 +113,7 @@ export async function POST(request: Request) {
       ? new Date(parsedBody.data.endDate)
       : undefined,
     rentAmount: parsedBody.data.rentAmount,
+    depositAmount: parsedBody.data.depositAmount,
     status: parsedBody.data.status,
   });
 

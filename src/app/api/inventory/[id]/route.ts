@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 
 import { auth } from "@/auth";
-import { InventoryItemModel } from "@/database/models";
+import {
+  InventoryAcknowledgementModel,
+  InventoryItemModel,
+} from "@/database/models";
 import { getCloudinaryClient } from "@/lib/cloudinary";
 import { connectMongoDB } from "@/lib/mongodb";
 
@@ -41,6 +44,9 @@ export async function DELETE(_request: Request, { params }: Context) {
     await getCloudinaryClient().uploader.destroy(item.cloudinaryPublicId, {
       resource_type: "image",
     });
+  await InventoryAcknowledgementModel.deleteMany({
+    inventoryItemId: item._id.toString(),
+  });
   await item.deleteOne();
   return NextResponse.json({ success: true });
 }

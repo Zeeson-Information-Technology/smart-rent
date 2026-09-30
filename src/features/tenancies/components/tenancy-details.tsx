@@ -26,6 +26,7 @@ import type { TenancyRecord } from "@/features/tenancies/types";
 import { DeleteTenancyButton } from "./delete-tenancy-button";
 import { RentAmountDisplay } from "./rent-amount-display";
 import { RentTracker } from "./rent-tracker";
+import { InventoryManager } from "@/features/properties/components";
 import { TenancyStatusBadge } from "./tenancy-status-badge";
 
 type TenancyDetailsProps = {
@@ -216,6 +217,10 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
               label="Rent amount"
               value={<RentAmountDisplay amount={tenancy.rentAmount} />}
             />
+            <Detail
+              label="Refundable deposit"
+              value={formatCurrency(tenancy.depositAmount)}
+            />
             <Detail label="Created" value={formatDate(tenancy.createdAt)} />
           </CardContent>
         </Card>
@@ -243,6 +248,9 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
         role={role}
         tenancyId={tenancy.id}
       />
+      {role === "tenant" && tenancy.property ? (
+        <InventoryManager canManage={false} propertyId={tenancy.propertyId} />
+      ) : null}
       <section className="mt-6">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-950">
           <AlertCircle className="h-5 w-5 text-blue-600" aria-hidden="true" />
@@ -314,4 +322,12 @@ function formatDate(value: string) {
     month: "short",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-GB", {
+    currency: "GBP",
+    maximumFractionDigits: 2,
+    style: "currency",
+  }).format(value);
 }

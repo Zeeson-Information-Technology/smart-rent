@@ -6,6 +6,7 @@ import { issueCreateSchema } from "@/features/issues/schemas";
 import { connectMongoDB } from "@/lib/mongodb";
 import { createIssueNotification } from "@/lib/notifications";
 import { getIssuePriority } from "@/lib/smartPriority";
+import { tenantMembershipConditions } from "@/lib/tenancy-access";
 
 import {
   forbiddenResponse,
@@ -25,11 +26,26 @@ export async function GET() {
 
   await connectMongoDB();
 
+  const tenantTenancies =
+    session.user.role === "tenant"
+      ? await TenancyModel.find({
+          $or: tenantMembershipConditions(session.user),
+        }).select("_id")
+      : [];
   const query =
     session.user.role === "admin"
       ? {}
       : session.user.role === "tenant"
-        ? { tenantId: session.user.id }
+        ? {
+            $or: [
+              { tenantId: session.user.id },
+              {
+                tenancyId: {
+                  $in: tenantTenancies.map((tenancy) => tenancy._id.toString()),
+                },
+              },
+            ],
+          }
         : { landlordId: session.user.id };
 
   const issues = await IssueModel.find(query).sort({ createdAt: -1 });

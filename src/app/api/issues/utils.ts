@@ -9,6 +9,7 @@ import {
 } from "@/database/models";
 import { connectMongoDB } from "@/lib/mongodb";
 import type { Property, Tenancy, UserRole } from "@/types/database";
+import { tenantBelongsToTenancy } from "@/lib/tenancy-access";
 
 export type ApiSessionUser = {
   email: string;
@@ -28,10 +29,15 @@ type TenancySummary = Pick<Tenancy, "tenantEmail" | "tenantName"> & {
 };
 
 export function unauthenticatedResponse() {
-  return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  return NextResponse.json(
+    { error: "Authentication is required." },
+    { status: 401 },
+  );
 }
 
-export function forbiddenResponse(message = "You are not authorized to access this resource.") {
+export function forbiddenResponse(
+  message = "You are not authorized to access this resource.",
+) {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
@@ -39,7 +45,9 @@ export function notFoundResponse() {
   return NextResponse.json({ error: "Issue not found." }, { status: 404 });
 }
 
-export function validationErrorResponse(fieldErrors: Record<string, string[] | undefined>) {
+export function validationErrorResponse(
+  fieldErrors: Record<string, string[] | undefined>,
+) {
   return NextResponse.json(
     {
       error: "Validation failed.",
@@ -61,7 +69,13 @@ export async function findAccessibleIssue(id: string, user: ApiSessionUser) {
   }
 
   if (user.role === "tenant") {
-    return IssueModel.findOne({ _id: id, tenantId: user.id });
+    const issue = await IssueModel.findById(id);
+    if (!issue) return null;
+    if (issue.tenantId === user.id) return issue;
+    const tenancy = issue.tenancyId
+      ? await TenancyModel.findById(issue.tenancyId)
+      : null;
+    return tenancy && tenantBelongsToTenancy(tenancy, user) ? issue : null;
   }
 
   return IssueModel.findOne({ _id: id, landlordId: user.id });

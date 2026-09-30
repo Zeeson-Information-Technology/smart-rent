@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
-import { DisputeModel, IssueModel } from "@/database/models";
+import { DisputeModel, IssueModel, TenancyModel } from "@/database/models";
 import { createDisputeSchema } from "@/features/disputes/schemas";
 import { connectMongoDB } from "@/lib/mongodb";
 import { createDisputeNotification } from "@/lib/notifications";
+import {
+  tenantBelongsToTenancy,
+  tenantMembershipConditions,
+} from "@/lib/tenancy-access";
 
 import {
   forbiddenResponse,
@@ -19,11 +23,27 @@ export async function GET() {
   if (!session?.user) return unauthenticatedResponse();
 
   await connectMongoDB();
+  const tenantTenancies =
+    session.user.role === "tenant"
+      ? await TenancyModel.find({
+          $or: tenantMembershipConditions(session.user),
+        }).select("_id")
+      : [];
   const query =
     session.user.role === "admin"
       ? {}
       : session.user.role === "tenant"
-        ? { tenantId: session.user.id }
+        ? {
+            $or: [
+              { tenantId: session.user.id },
+              { raisedBy: session.user.id },
+              {
+                tenancyId: {
+                  $in: tenantTenancies.map((tenancy) => tenancy._id.toString()),
+                },
+              },
+            ],
+          }
         : { landlordId: session.user.id };
   const disputes = await DisputeModel.find(query).sort({ createdAt: -1 });
 
@@ -48,10 +68,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Issue not found." }, { status: 404 });
   }
 
+  const tenancy = issue.tenancyId
+    ? await TenancyModel.findById(issue.tenancyId)
+    : null;
   const canCreate =
     session.user.role === "admin" ||
     issue.tenantId === session.user.id ||
-    issue.landlordId === session.user.id;
+    issue.landlordId === session.user.id ||
+    (session.user.role === "tenant" &&
+      tenancy !== null &&
+      tenantBelongsToTenancy(tenancy, session.user));
   if (!canCreate) {
     return forbiddenResponse("You cannot raise a dispute for this issue.");
   }
@@ -81,5 +107,8 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.json({ dispute: await serializeDispute(dispute) }, { status: 201 });
+  return NextResponse.json(
+    { dispute: await serializeDispute(dispute) },
+    { status: 201 },
+  );
 }
