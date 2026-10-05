@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:production": "node scripts/production-smoke.mjs",
+    "test:researcher": "node scripts/researcher-retest.mjs",
     "typecheck": "tsc --noEmit --incremental false",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
