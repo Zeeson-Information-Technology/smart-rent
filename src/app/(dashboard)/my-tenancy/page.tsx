@@ -23,7 +23,13 @@ export default async function MyTenancyPage() {
         eyebrow="Tenant workspace"
         title="My tenancy"
       />
-      <MyTenancyView />
+      <MyTenancyView
+        currentUser={{
+          email: session.user.email,
+          id: session.user.id,
+          name: session.user.name,
+        }}
+      />
     </>
   );
 }

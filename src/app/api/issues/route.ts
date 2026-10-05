@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
-import { IssueModel, PropertyModel, TenancyModel } from "@/database/models";
+import {
+  IssueModel,
+  PropertyModel,
+  TenancyModel,
+  UserModel,
+} from "@/database/models";
 import { issueCreateSchema } from "@/features/issues/schemas";
 import { connectMongoDB } from "@/lib/mongodb";
 import { createIssueNotification } from "@/lib/notifications";
@@ -53,9 +58,11 @@ export async function GET() {
   const tenancyIds = [
     ...new Set(issues.map((issue) => issue.tenancyId).filter(Boolean)),
   ];
-  const [properties, tenancies] = await Promise.all([
+  const reporterIds = [...new Set(issues.map((issue) => issue.tenantId))];
+  const [properties, tenancies, reporters] = await Promise.all([
     PropertyModel.find({ _id: { $in: propertyIds } }),
     TenancyModel.find({ _id: { $in: tenancyIds } }),
+    UserModel.find({ _id: { $in: reporterIds } }).select("name"),
   ]);
   const propertiesById = new Map(
     properties.map((property) => [
@@ -69,6 +76,9 @@ export async function GET() {
       serializeTenancySummary(tenancy),
     ]),
   );
+  const reportersById = new Map(
+    reporters.map((reporter) => [reporter._id.toString(), reporter.name]),
+  );
 
   return NextResponse.json({
     issues: issues.map((issue) =>
@@ -76,6 +86,7 @@ export async function GET() {
         issue,
         propertiesById.get(issue.propertyId),
         issue.tenancyId ? tenanciesById.get(issue.tenancyId) : null,
+        reportersById.get(issue.tenantId),
       ),
     ),
   });
@@ -158,6 +169,7 @@ export async function POST(request: Request) {
         issue,
         serializePropertySummary(property),
         serializeTenancySummary(tenancy),
+        session.user.name,
       ),
     },
     { status: 201 },

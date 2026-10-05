@@ -49,7 +49,7 @@ const features = [
     icon: FileText,
     title: "Report preparation",
     description:
-      "Turn structured records into professional report previews for review.",
+      "Use structured records and portfolio analytics to support professional reviews.",
   },
 ];
 
@@ -149,7 +149,7 @@ export default function HomePage() {
                 Surface the work that needs attention first.
               </h2>
               <p className="mt-4 text-base leading-7 text-slate-600">
-                Prioritization previews help property teams understand urgent
+                Smart prioritization helps property teams understand urgent
                 issues, missing documentation, and records that need follow-up.
               </p>
               <div className="mt-6 grid gap-3">
@@ -180,8 +180,13 @@ export default function HomePage() {
                   return (
                     <Card key={item.label}>
                       <CardContent className="p-5">
-                        <Icon className="h-5 w-5 text-blue-600" aria-hidden="true" />
-                        <p className="mt-5 text-sm text-slate-500">{item.label}</p>
+                        <Icon
+                          className="h-5 w-5 text-blue-600"
+                          aria-hidden="true"
+                        />
+                        <p className="mt-5 text-sm text-slate-500">
+                          {item.label}
+                        </p>
                         <p className="mt-1 text-2xl font-semibold text-slate-950">
                           {item.value}
                         </p>
@@ -249,7 +254,10 @@ export default function HomePage() {
                       className="rounded-xl border border-slate-200 bg-white p-4"
                       key={item.label}
                     >
-                      <Icon className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                      <Icon
+                        className="h-5 w-5 text-blue-600"
+                        aria-hidden="true"
+                      />
                       <p className="mt-3 text-sm font-semibold text-slate-900">
                         {item.label}
                       </p>
@@ -316,8 +324,14 @@ export default function HomePage() {
                   const Icon = item.icon;
 
                   return (
-                    <div className="rounded-xl bg-slate-50 p-4" key={item.title}>
-                      <Icon className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                    <div
+                      className="rounded-xl bg-slate-50 p-4"
+                      key={item.title}
+                    >
+                      <Icon
+                        className="h-5 w-5 text-blue-600"
+                        aria-hidden="true"
+                      />
                       <h3 className="mt-4 text-sm font-semibold text-slate-950">
                         {item.title}
                       </h3>
@@ -336,8 +350,8 @@ export default function HomePage() {
               </h2>
               <p className="mt-4 text-base leading-7 text-slate-600">
                 The interface is structured around traceable user journeys so
-                dissertation testing can capture clear screenshots and repeatable
-                workflows across roles.
+                dissertation testing can capture clear screenshots and
+                repeatable workflows across roles.
               </p>
             </div>
           </div>
@@ -346,13 +360,14 @@ export default function HomePage() {
         <SectionWrapper className="bg-white">
           <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
             <div>
-              <Badge>Product preview</Badge>
+              <Badge>Product workspace</Badge>
               <h2 className="mt-4 text-3xl font-semibold tracking-normal text-slate-950">
-                A dashboard foundation ready for future product screens.
+                One workspace for day-to-day property operations.
               </h2>
               <p className="mt-4 text-base leading-7 text-slate-600">
-                Placeholder dashboard mockups show the product&apos;s information
-                density, hierarchy, and professional SaaS feel.
+                Clear dashboards surface portfolio health, urgent issues,
+                tenancy activity, messages, and disputes without unnecessary
+                noise.
               </p>
             </div>
             <DashboardPreview />
@@ -374,7 +389,9 @@ export default function HomePage() {
               {faqs.map((faq) => (
                 <Card key={faq.question}>
                   <CardContent className="p-5">
-                    <h3 className="font-semibold text-slate-950">{faq.question}</h3>
+                    <h3 className="font-semibold text-slate-950">
+                      {faq.question}
+                    </h3>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
                       {faq.answer}
                     </p>

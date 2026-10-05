@@ -23,8 +23,8 @@ export function DataTable<Row>({
       className={cn(
         "overflow-hidden bg-white",
         variant === "standalone" &&
-          "rounded-2xl border border-slate-200 shadow-sm shadow-slate-200/60",
-        variant === "embedded" && "rounded-b-2xl",
+          "rounded-xl border border-slate-200 shadow-sm shadow-slate-200/50",
+        variant === "embedded" && "rounded-b-xl",
       )}
     >
       <div className="overflow-x-auto">
@@ -42,7 +42,7 @@ export function DataTable<Row>({
             {rows.map((row, rowIndex) => (
               <tr className="text-slate-700" key={rowIndex}>
                 {columns.map((column) => (
-                  <td className="px-4 py-4 align-middle" key={column.header}>
+                  <td className="px-4 py-3.5 align-middle" key={column.header}>
                     {column.render(row)}
                   </td>
                 ))}

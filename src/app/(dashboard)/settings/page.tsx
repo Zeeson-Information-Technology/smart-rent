@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Bell, ShieldCheck, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
+import Link from "next/link";
 
-import { DashboardCard, EmptyState, PageHeader, StatCard } from "@/components/dashboard";
+import { DashboardCard, EmptyState, PageHeader } from "@/components/dashboard";
+import { Button } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -11,21 +13,21 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader
-        description="Static workspace settings preview. Settings are not connected to persistence yet."
+        description="Manage account and workspace preferences as they become available."
         eyebrow="Workspace"
         title="Settings"
       />
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard icon={SlidersHorizontal} label="Preferences" value="8" />
-        <StatCard icon={Bell} label="Notifications" value="3" />
-        <StatCard icon={ShieldCheck} label="Security checks" value="Ready" />
-      </div>
       <DashboardCard>
         <div className="p-5">
           <EmptyState
-            description="Workspace preferences, notification rules, and security options will appear here when settings are connected."
+            action={
+              <Link href="/profile">
+                <Button variant="outline">View account profile</Button>
+              </Link>
+            }
+            description="There are no configurable workspace settings yet. Your account details and role remain available from your profile."
             icon={SlidersHorizontal}
-            title="Settings are ready for backend wiring"
+            title="No configurable settings"
           />
         </div>
       </DashboardCard>

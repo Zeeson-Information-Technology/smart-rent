@@ -12,16 +12,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import {
-  DataTable,
-  EmptyState,
-  PageHeader,
-  StatCard,
-  StatusBadge,
-} from "@/components/dashboard";
+import { EmptyState, PageHeader, StatCard } from "@/components/dashboard";
 import { Button, Card, CardContent, CardHeader } from "@/components/ui";
 import type { UserRole } from "@/types/database";
 import type { TenancyRecord } from "@/features/tenancies/types";
+import { getTenancyMemberRole } from "@/lib/tenancy-membership";
 
 import { DeleteTenancyButton } from "./delete-tenancy-button";
 import { RentAmountDisplay } from "./rent-amount-display";
@@ -30,31 +25,18 @@ import { InventoryManager } from "@/features/properties/components";
 import { TenancyStatusBadge } from "./tenancy-status-badge";
 
 type TenancyDetailsProps = {
+  currentUser?: { email: string; id: string; name: string };
   id: string;
   role: UserRole;
 };
 
-const placeholderIssues = [
-  {
-    title: "Related issues will appear here",
-    date: "Not connected yet",
-    status: "Pending" as const,
-  },
-];
-
-const placeholderDisputes = [
-  {
-    title: "Related disputes will appear here",
-    date: "Not connected yet",
-    status: "Draft" as const,
-  },
-];
-
-export function TenancyDetails({ id, role }: TenancyDetailsProps) {
+export function TenancyDetails({ currentUser, id, role }: TenancyDetailsProps) {
   const [tenancy, setTenancy] = useState<TenancyRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const canManage = role === "landlord" || role === "admin";
+  const memberRole =
+    tenancy && currentUser ? getTenancyMemberRole(tenancy, currentUser) : null;
 
   useEffect(() => {
     let mounted = true;
@@ -134,10 +116,29 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
         }
         description="Tenancy record with tenant, property, and lease context."
         eyebrow="Tenancy details"
-        title={`${tenancy.tenantName} tenancy`}
+        title={`${tenancy.property?.propertyName ?? "Property"} tenancy`}
       />
+      {currentUser && memberRole ? (
+        <div className="mb-6 flex flex-col gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-blue-950">
+              Viewing as {currentUser.name}
+            </p>
+            <p className="mt-1 text-sm text-blue-800">
+              You are linked to this agreement as a {memberRole} tenant.
+            </p>
+          </div>
+          <span className="w-fit rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-semibold capitalize text-blue-700">
+            {memberRole} tenant
+          </span>
+        </div>
+      ) : null}
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
-        <StatCard icon={User} label="Tenant" value={tenancy.tenantName} />
+        <StatCard
+          icon={User}
+          label="Primary tenant"
+          value={tenancy.tenantName}
+        />
         <StatCard
           icon={Home}
           label="Property"
@@ -154,18 +155,18 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
         <Card>
           <CardHeader>
             <h2 className="text-lg font-semibold text-slate-950">
-              Tenant details
+              Primary tenant details
             </h2>
           </CardHeader>
           <CardContent className="grid gap-4 text-sm">
-            <Detail label="Name" value={tenancy.tenantName} />
-            <Detail label="Email" value={tenancy.tenantEmail} />
+            <Detail label="Primary tenant name" value={tenancy.tenantName} />
+            <Detail label="Primary tenant email" value={tenancy.tenantEmail} />
             <Detail
               label="Contact number"
               value={tenancy.tenantPhone || "Not provided"}
             />
             <Detail
-              label="Linked account"
+              label="Primary tenant account"
               value={tenancy.tenantId ? "Linked" : "Pending registration"}
             />
             <Detail
@@ -256,21 +257,15 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
           <AlertCircle className="h-5 w-5 text-blue-600" aria-hidden="true" />
           Related issues
         </h2>
-        <DataTable
-          columns={[
-            {
-              header: "Issue",
-              render: (row) => (
-                <span className="font-medium text-slate-950">{row.title}</span>
-              ),
-            },
-            { header: "Date", render: (row) => row.date },
-            {
-              header: "Status",
-              render: (row) => <StatusBadge status={row.status} />,
-            },
-          ]}
-          rows={placeholderIssues}
+        <EmptyState
+          action={
+            <Link href="/issues">
+              <Button variant="outline">View issues</Button>
+            </Link>
+          }
+          description="Open the Issues workspace to review records linked to this tenancy and property."
+          icon={AlertCircle}
+          title="Review related issues"
         />
       </section>
       <section className="mt-6">
@@ -278,21 +273,15 @@ export function TenancyDetails({ id, role }: TenancyDetailsProps) {
           <Scale className="h-5 w-5 text-blue-600" aria-hidden="true" />
           Related disputes
         </h2>
-        <DataTable
-          columns={[
-            {
-              header: "Dispute",
-              render: (row) => (
-                <span className="font-medium text-slate-950">{row.title}</span>
-              ),
-            },
-            { header: "Date", render: (row) => row.date },
-            {
-              header: "Status",
-              render: (row) => <StatusBadge status={row.status} />,
-            },
-          ]}
-          rows={placeholderDisputes}
+        <EmptyState
+          action={
+            <Link href="/disputes">
+              <Button variant="outline">View disputes</Button>
+            </Link>
+          }
+          description="Open the Disputes workspace to review cases linked to this tenancy."
+          icon={Scale}
+          title="Review related disputes"
         />
       </section>
     </>

@@ -78,11 +78,12 @@ export async function findAccessibleDispute(id: string, user: ApiSessionUser) {
 }
 
 export async function serializeDispute(dispute: DisputeDocument) {
-  const [issue, property, tenancy, tenant] = await Promise.all([
+  const [issue, property, tenancy, tenant, raisedBy] = await Promise.all([
     IssueModel.findOne({ _id: dispute.issueId }),
     PropertyModel.findOne({ _id: dispute.propertyId }),
     dispute.tenancyId ? TenancyModel.findOne({ _id: dispute.tenancyId }) : null,
     UserModel.findOne({ _id: dispute.tenantId }),
+    UserModel.findOne({ _id: dispute.raisedBy }).select("name"),
   ]);
 
   return {
@@ -103,6 +104,8 @@ export async function serializeDispute(dispute: DisputeDocument) {
     issueTitle: issue?.title ?? "Issue unavailable",
     propertyName: property?.propertyName ?? "Property unavailable",
     tenantName: tenancy?.tenantName ?? tenant?.name ?? "Tenant",
+    primaryTenantName: tenancy?.tenantName ?? tenant?.name ?? "Tenant",
+    raisedByName: raisedBy?.name ?? tenant?.name ?? "SmartRent user",
     createdAt: dispute.createdAt.toISOString(),
     updatedAt: dispute.updatedAt.toISOString(),
   };

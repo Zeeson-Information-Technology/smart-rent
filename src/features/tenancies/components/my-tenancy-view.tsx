@@ -10,7 +10,11 @@ import type { TenancyRecord } from "@/features/tenancies/types";
 
 import { TenancyDetails } from "./tenancy-details";
 
-export function MyTenancyView() {
+type MyTenancyViewProps = {
+  currentUser: { email: string; id: string; name: string };
+};
+
+export function MyTenancyView({ currentUser }: MyTenancyViewProps) {
   const [tenancy, setTenancy] = useState<TenancyRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,5 +87,7 @@ export function MyTenancyView() {
     );
   }
 
-  return <TenancyDetails id={tenancy.id} role="tenant" />;
+  return (
+    <TenancyDetails currentUser={currentUser} id={tenancy.id} role="tenant" />
+  );
 }

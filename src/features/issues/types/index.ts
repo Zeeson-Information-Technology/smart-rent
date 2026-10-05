@@ -33,6 +33,7 @@ export type IssueRecord = {
   description: string;
   priority: IssuePriority;
   status: IssueStatus;
+  reportedByName: string;
   property: IssuePropertySummary | null;
   tenancy: IssueTenancySummary | null;
   createdAt: string;

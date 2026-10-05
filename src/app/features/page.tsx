@@ -44,19 +44,19 @@ const featureGroups = [
     icon: ShieldCheck,
     title: "Dispute readiness",
     description:
-      "Prepare organized timelines and evidence summaries for future dispute workflows.",
+      "Build structured dispute records with linked issues, evidence, communication history, status tracking, and resolution notes.",
   },
   {
     icon: MessageSquare,
     title: "Messaging context",
     description:
-      "Keep communication previews attached to the property and tenancy records they relate to.",
+      "Keep private landlord and tenant conversations attached to the property, tenancy, or issue they relate to.",
   },
   {
     icon: FileText,
     title: "Reports",
     description:
-      "Preview structured reports that can later include records, evidence, issues, and messages.",
+      "Review portfolio analytics and organized records that support reporting and case preparation.",
   },
   {
     icon: Archive,
@@ -73,7 +73,7 @@ export default function FeaturesPage() {
       <main className="bg-background">
         <SectionWrapper className="border-b bg-white py-0">
           <PageHero
-            description="SmartRent brings property operations, issue documentation, communication context, and report previews together in a professional static frontend."
+            description="SmartRent brings property operations, tenancy records, issue documentation, evidence, communication, and dispute tracking into one secure workspace."
             eyebrow="Features"
             title="Designed around the property records teams actually need."
           >
@@ -94,11 +94,12 @@ export default function FeaturesPage() {
             <div>
               <Badge>Operational clarity</Badge>
               <h2 className="mt-4 text-3xl font-semibold tracking-normal text-slate-950">
-                Static previews that map cleanly to future product modules.
+                Connected workflows built around reliable property records.
               </h2>
               <p className="mt-4 text-base leading-7 text-slate-600">
-                The frontend structure is ready for later product screens
-                without adding backend behavior to this marketing layer.
+                Role-aware workspaces keep landlords, tenants, and
+                administrators focused on the information and actions relevant
+                to them.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -111,12 +112,16 @@ export default function FeaturesPage() {
                 return (
                   <Card key={item.label}>
                     <CardContent className="p-6">
-                      <Icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                      <Icon
+                        className="h-6 w-6 text-blue-600"
+                        aria-hidden="true"
+                      />
                       <h3 className="mt-5 text-lg font-semibold text-slate-950">
                         {item.label}
                       </h3>
                       <p className="mt-2 text-sm leading-6 text-slate-600">
-                        Built as responsive UI placeholders for future data-backed workflows.
+                        Connected to structured workflows designed for clear,
+                        repeatable property operations.
                       </p>
                     </CardContent>
                   </Card>

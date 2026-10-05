@@ -16,13 +16,13 @@ export function DashboardCard({
   return (
     <section
       className={cn(
-        "rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/60",
+        "overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm shadow-slate-200/50",
         className,
       )}
     >
       {title ? (
-        <div className="border-b border-slate-100 px-5 py-4">
-          <h2 className="text-base font-semibold text-slate-950">{title}</h2>
+        <div className="border-b border-slate-100 px-4 py-3.5 sm:px-5">
+          <h2 className="text-sm font-semibold text-slate-950">{title}</h2>
         </div>
       ) : null}
       {children}

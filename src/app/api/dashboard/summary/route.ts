@@ -17,7 +17,6 @@ import type {
   DashboardRecentUser,
   DashboardStat,
   DashboardSummary,
-  DashboardUpcomingActivity,
 } from "@/features/dashboard/types";
 import { connectMongoDB } from "@/lib/mongodb";
 import type { UserRole } from "@/types/database";
@@ -159,7 +158,7 @@ async function getLandlordSummary(
       openDisputes: activeDisputes,
       totalProperties,
     },
-    upcomingActivities: defaultUpcomingActivities,
+    upcomingActivities: [],
   };
 }
 
@@ -346,15 +345,6 @@ async function getAdminSummary(user: DashboardUser): Promise<DashboardSummary> {
 
 const openIssueStatuses = ["open", "in_progress", "awaiting_response"];
 const activeDisputeStatuses = ["open", "under_review", "in_progress"];
-
-const defaultUpcomingActivities: DashboardUpcomingActivity[] = [
-  {
-    date: "Pending",
-    location: "SmartRent calendar",
-    time: "TBC",
-    title: "Appointments model not connected yet",
-  },
-];
 
 function stat(
   label: string,

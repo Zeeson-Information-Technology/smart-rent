@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Cookie, Database, Mail, ShieldCheck, TimerReset, UserRound } from "lucide-react";
+import {
+  Cookie,
+  Database,
+  Mail,
+  ShieldCheck,
+  TimerReset,
+  UserRound,
+} from "lucide-react";
 
 import { Footer, PageHero, SectionWrapper } from "@/components/marketing";
 import { PublicNavbar } from "@/components/navigation";
@@ -15,7 +22,7 @@ const privacySections = [
   {
     icon: Database,
     title: "Data collection",
-    body: "SmartRent is designed to collect account, property, tenancy, issue, dispute, and communication records when product features are enabled. The current website uses static placeholder content only.",
+    body: "SmartRent processes account, property, tenancy, inventory, rent, issue, evidence, dispute, notification, and communication records needed to provide the service.",
   },
   {
     icon: UserRound,
@@ -25,7 +32,7 @@ const privacySections = [
   {
     icon: Cookie,
     title: "Cookies",
-    body: "Cookies may be used for essential site behavior, security, session continuity, analytics, and preference storage when those services are connected.",
+    body: "Essential cookies are used for secure authentication and session continuity. Optional analytics or preference cookies should only be introduced with appropriate notice and controls.",
   },
   {
     icon: TimerReset,
@@ -52,10 +59,14 @@ export default function PrivacyPage() {
           >
             <Card className="bg-blue-600 text-white">
               <CardContent className="p-8">
-                <ShieldCheck className="h-10 w-10 text-blue-100" aria-hidden="true" />
+                <ShieldCheck
+                  className="h-10 w-10 text-blue-100"
+                  aria-hidden="true"
+                />
                 <p className="mt-8 text-2xl font-semibold leading-snug">
                   Property records can contain sensitive context. SmartRent is
-                  designed around clear data boundaries and transparent handling.
+                  designed around clear data boundaries and transparent
+                  handling.
                 </p>
               </CardContent>
             </Card>
@@ -69,7 +80,10 @@ export default function PrivacyPage() {
               return (
                 <Card key={section.title}>
                   <CardContent className="p-6">
-                    <Icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                    <Icon
+                      className="h-6 w-6 text-blue-600"
+                      aria-hidden="true"
+                    />
                     <h2 className="mt-5 text-lg font-semibold text-slate-950">
                       {section.title}
                     </h2>

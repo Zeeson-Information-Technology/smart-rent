@@ -11,14 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import {
-  DataTable,
-  EmptyState,
-  PageHeader,
-  PriorityBadge,
-  StatCard,
-  StatusBadge,
-} from "@/components/dashboard";
+import { EmptyState, PageHeader, StatCard } from "@/components/dashboard";
 import { Button, Card, CardContent, CardHeader } from "@/components/ui";
 import type { PropertyRecord } from "@/features/properties/types";
 
@@ -30,23 +23,6 @@ import { PropertyTypeBadge } from "./property-type-badge";
 type PropertyDetailsProps = {
   id: string;
 };
-
-const placeholderIssues = [
-  {
-    title: "Related issues will appear here",
-    priority: "Medium" as const,
-    status: "Pending" as const,
-    reported: "Not connected yet",
-  },
-];
-
-const placeholderDisputes = [
-  {
-    caseName: "Related disputes will appear here",
-    status: "Draft" as const,
-    owner: "Not connected yet",
-  },
-];
 
 export function PropertyDetails({ id }: PropertyDetailsProps) {
   const [property, setProperty] = useState<PropertyRecord | null>(null);
@@ -129,7 +105,7 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
             />
           </div>
         }
-        description="Property profile with future tenancy, issue, and dispute context."
+        description="Review property information, inventory, and related management records."
         eyebrow="Property details"
         title={property.propertyName}
       />
@@ -144,8 +120,20 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
           label="Bedrooms"
           value={property.bedroomCount.toString()}
         />
-        <StatCard icon={User} label="Assigned tenant" value="Not connected" />
-        <StatCard icon={AlertCircle} label="Open issues" value="0" />
+        <StatCard
+          href="/tenancies"
+          icon={User}
+          label="Tenancies"
+          linkLabel="View records"
+          value="Manage"
+        />
+        <StatCard
+          href="/issues"
+          icon={AlertCircle}
+          label="Issues"
+          linkLabel="View records"
+          value="Review"
+        />
       </div>
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
@@ -182,14 +170,16 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
               Related tenancies
             </h2>
           </CardHeader>
-          <CardContent className="grid gap-4 text-sm">
-            <InfoRow label="Current tenant" value="Not connected yet" />
-            <InfoRow label="Tenancy status" value="Tenancy module pending" />
-            <InfoRow label="Monthly rent" value="Not connected yet" />
-            <InfoRow
-              label="Last updated"
-              value={formatDate(property.updatedAt)}
-            />
+          <CardContent>
+            <p className="text-sm leading-6 text-slate-600">
+              Tenant contacts, deposits, lease dates, and rent tracking are
+              managed from the Tenancies workspace.
+            </p>
+            <Link href="/tenancies">
+              <Button className="mt-4" variant="outline">
+                View tenancies
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -198,25 +188,15 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
         <h2 className="mb-3 text-lg font-semibold text-slate-950">
           Related issues
         </h2>
-        <DataTable
-          columns={[
-            {
-              header: "Issue",
-              render: (row) => (
-                <span className="font-medium text-slate-950">{row.title}</span>
-              ),
-            },
-            { header: "Reported", render: (row) => row.reported },
-            {
-              header: "Priority",
-              render: (row) => <PriorityBadge priority={row.priority} />,
-            },
-            {
-              header: "Status",
-              render: (row) => <StatusBadge status={row.status} />,
-            },
-          ]}
-          rows={placeholderIssues}
+        <EmptyState
+          action={
+            <Link href="/issues">
+              <Button variant="outline">View issues</Button>
+            </Link>
+          }
+          description="Open the Issues workspace to review records associated with your properties."
+          icon={AlertCircle}
+          title="Review related issues"
         />
       </section>
       <section className="mt-6">
@@ -224,23 +204,15 @@ export function PropertyDetails({ id }: PropertyDetailsProps) {
           <Scale className="h-5 w-5 text-blue-600" aria-hidden="true" />
           Related disputes
         </h2>
-        <DataTable
-          columns={[
-            {
-              header: "Dispute",
-              render: (row) => (
-                <span className="font-medium text-slate-950">
-                  {row.caseName}
-                </span>
-              ),
-            },
-            { header: "Owner", render: (row) => row.owner },
-            {
-              header: "Status",
-              render: (row) => <StatusBadge status={row.status} />,
-            },
-          ]}
-          rows={placeholderDisputes}
+        <EmptyState
+          action={
+            <Link href="/disputes">
+              <Button variant="outline">View disputes</Button>
+            </Link>
+          }
+          description="Open the Disputes workspace to review cases associated with your properties."
+          icon={Scale}
+          title="Review related disputes"
         />
       </section>
     </>

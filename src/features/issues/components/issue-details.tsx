@@ -121,7 +121,7 @@ export function IssueDetails({ currentUserId, id, role }: IssueDetailsProps) {
             <Button variant="outline">Raise Dispute</Button>
           </Link>
         }
-        description="Issue detail, smart priority, status, and documentation placeholders."
+        description="Review issue details, smart priority, status, evidence, and communication history."
         eyebrow="Issue details"
         title={issue.title}
       />
@@ -139,10 +139,16 @@ export function IssueDetails({ currentUserId, id, role }: IssueDetailsProps) {
           <CardContent className="grid gap-4 text-sm leading-6 text-slate-600">
             <p>{issue.description}</p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Summary label="Property" value={issue.property?.propertyName ?? "Unavailable"} />
+              <Summary
+                label="Property"
+                value={issue.property?.propertyName ?? "Unavailable"}
+              />
               <Summary label="Category" value={issue.category} />
-              <Summary label="Reported by" value={issue.tenancy?.tenantName ?? "Tenant"} />
-              <Summary label="Reported date" value={formatDate(issue.createdAt)} />
+              <Summary label="Reported by" value={issue.reportedByName} />
+              <Summary
+                label="Reported date"
+                value={formatDate(issue.createdAt)}
+              />
               <Summary label="Evidence" value={evidenceCount.toString()} />
             </div>
           </CardContent>
@@ -150,18 +156,25 @@ export function IssueDetails({ currentUserId, id, role }: IssueDetailsProps) {
 
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-slate-950">Status tracking</h2>
+            <h2 className="text-lg font-semibold text-slate-950">
+              Status tracking
+            </h2>
           </CardHeader>
           <CardContent className="grid gap-4">
             {canUpdateStatus ? (
               <>
-                <label className="grid gap-2 text-sm font-medium text-slate-700" htmlFor="status">
+                <label
+                  className="grid gap-2 text-sm font-medium text-slate-700"
+                  htmlFor="status"
+                >
                   Status
                   <select
                     className="h-11 rounded-lg border bg-white px-3 text-sm shadow-sm outline-none focus:border-primary focus:ring-4 focus:ring-blue-100"
                     id="status"
                     name="status"
-                    onChange={(event) => setStatus(event.target.value as IssueStatus)}
+                    onChange={(event) =>
+                      setStatus(event.target.value as IssueStatus)
+                    }
                     value={status}
                   >
                     {ISSUE_STATUSES.map((item) => (
@@ -171,11 +184,16 @@ export function IssueDetails({ currentUserId, id, role }: IssueDetailsProps) {
                     ))}
                   </select>
                 </label>
-                <Button disabled={isSaving || status === issue.status} onClick={updateStatus}>
+                <Button
+                  disabled={isSaving || status === issue.status}
+                  onClick={updateStatus}
+                >
                   {isSaving ? "Saving..." : "Update status"}
                 </Button>
                 {message ? (
-                  <p className="text-sm font-medium text-slate-600">{message}</p>
+                  <p className="text-sm font-medium text-slate-600">
+                    {message}
+                  </p>
                 ) : null}
               </>
             ) : (
@@ -214,10 +232,15 @@ export function IssueDetails({ currentUserId, id, role }: IssueDetailsProps) {
         </Card>
         <Card>
           <CardHeader>
-            <h2 className="text-lg font-semibold text-slate-950">Communication</h2>
+            <h2 className="text-lg font-semibold text-slate-950">
+              Communication
+            </h2>
           </CardHeader>
           <CardContent>
-            <IssueConversationPanel currentUserId={currentUserId} issue={issue} />
+            <IssueConversationPanel
+              currentUserId={currentUserId}
+              issue={issue}
+            />
           </CardContent>
         </Card>
       </div>
@@ -228,7 +251,9 @@ export function IssueDetails({ currentUserId, id, role }: IssueDetailsProps) {
 function Summary({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border bg-slate-50 p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        {label}
+      </p>
       <p className="mt-1 font-medium text-slate-950">{value}</p>
     </div>
   );

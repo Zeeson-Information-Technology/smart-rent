@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Building2, CheckCircle2, Compass, ShieldCheck, Users } from "lucide-react";
+import {
+  Building2,
+  CheckCircle2,
+  Compass,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 
 import {
   CtaSection,
@@ -50,7 +56,10 @@ export default function AboutPage() {
           >
             <Card className="bg-slate-950 text-white">
               <CardContent className="p-8">
-                <Building2 className="h-10 w-10 text-blue-300" aria-hidden="true" />
+                <Building2
+                  className="h-10 w-10 text-blue-300"
+                  aria-hidden="true"
+                />
                 <p className="mt-8 text-2xl font-semibold leading-snug">
                   We believe property management software should make evidence,
                   decisions, and communication easier to understand.
@@ -68,7 +77,10 @@ export default function AboutPage() {
               return (
                 <Card key={principle.title}>
                   <CardContent className="p-6">
-                    <Icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                    <Icon
+                      className="h-6 w-6 text-blue-600"
+                      aria-hidden="true"
+                    />
                     <h2 className="mt-5 text-lg font-semibold text-slate-950">
                       {principle.title}
                     </h2>
@@ -92,10 +104,16 @@ export default function AboutPage() {
               {[
                 "Reduce scattered property documentation",
                 "Create calm, professional tools for repeated operations",
-                "Prepare a clean UI foundation for future product development",
+                "Support transparent collaboration between landlords and tenants",
               ].map((item) => (
-                <div className="flex items-center gap-3 rounded-xl border bg-white p-4" key={item}>
-                  <CheckCircle2 className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                <div
+                  className="flex items-center gap-3 rounded-xl border bg-white p-4"
+                  key={item}
+                >
+                  <CheckCircle2
+                    className="h-5 w-5 text-blue-600"
+                    aria-hidden="true"
+                  />
                   <span className="font-medium text-slate-800">{item}</span>
                 </div>
               ))}

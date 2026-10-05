@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { FileArchive, FileText } from "lucide-react";
+import { FileArchive } from "lucide-react";
+import Link from "next/link";
 
-import { EmptyState, PageHeader, StatCard } from "@/components/dashboard";
+import { EmptyState, PageHeader } from "@/components/dashboard";
 import { Button } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -12,20 +13,19 @@ export default function DocumentsPage() {
   return (
     <>
       <PageHeader
-        description="Static tenant document center for future tenancy documents and evidence files."
+        description="Access evidence and documents associated with your tenancy records."
         eyebrow="Tenant workspace"
         title="Documents"
       />
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard icon={FileText} label="Tenancy documents" value="4" />
-        <StatCard icon={FileArchive} label="Evidence files" value="7" />
-        <StatCard icon={FileText} label="Reports shared" value="2" />
-      </div>
       <EmptyState
-        action={<Button type="button">Upload placeholder</Button>}
-        description="Documents shared with the tenant will appear here when document workflows are connected."
+        action={
+          <Link href="/issues">
+            <Button type="button">View issue evidence</Button>
+          </Link>
+        }
+        description="Evidence files are currently managed from their related issue or dispute. A consolidated document library is not yet available."
         icon={FileArchive}
-        title="No new documents"
+        title="Documents are organized by record"
       />
     </>
   );

@@ -12,14 +12,17 @@ export function DisputeSummaryCard({ dispute }: { dispute: DisputeRecord }) {
           <DisputeStatusBadge status={dispute.status} />
           <DisputePriorityBadge priority={dispute.priority} />
         </div>
-        <h2 className="mt-4 text-lg font-semibold text-slate-950">Dispute Summary</h2>
+        <h2 className="mt-4 text-lg font-semibold text-slate-950">
+          Dispute Summary
+        </h2>
       </CardHeader>
       <CardContent className="grid gap-4 text-sm">
         <Info label="Reference" value={dispute.disputeReference} />
         <Info label="Title" value={dispute.title} />
         <Info label="Reason" value={dispute.reason} />
         <Info label="Property" value={dispute.propertyName} />
-        <Info label="Tenant" value={dispute.tenantName} />
+        <Info label="Raised by" value={dispute.raisedByName} />
+        <Info label="Primary tenant" value={dispute.primaryTenantName} />
         <div className="rounded-xl border bg-slate-50 p-4 text-sm leading-6 text-slate-600">
           {dispute.description}
         </div>

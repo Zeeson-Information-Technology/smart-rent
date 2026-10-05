@@ -18,6 +18,8 @@ export type DisputeRecord = {
   issueTitle: string;
   propertyName: string;
   tenantName: string;
+  primaryTenantName: string;
+  raisedByName: string;
   createdAt: string;
   updatedAt: string;
 };

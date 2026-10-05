@@ -5,6 +5,7 @@ import {
   IssueModel,
   PropertyModel,
   TenancyModel,
+  UserModel,
   type IssueDocument,
 } from "@/database/models";
 import { connectMongoDB } from "@/lib/mongodb";
@@ -82,15 +83,17 @@ export async function findAccessibleIssue(id: string, user: ApiSessionUser) {
 }
 
 export async function serializeIssueWithRelations(issue: IssueDocument) {
-  const [property, tenancy] = await Promise.all([
+  const [property, tenancy, reporter] = await Promise.all([
     PropertyModel.findOne({ _id: issue.propertyId }),
     issue.tenancyId ? TenancyModel.findOne({ _id: issue.tenancyId }) : null,
+    UserModel.findOne({ _id: issue.tenantId }).select("name"),
   ]);
 
   return serializeIssue(
     issue,
     property ? serializePropertySummary(property) : null,
     tenancy ? serializeTenancySummary(tenancy) : null,
+    reporter?.name,
   );
 }
 
@@ -98,6 +101,7 @@ export function serializeIssue(
   issue: IssueDocument,
   property?: PropertySummary | null,
   tenancy?: TenancySummary | null,
+  reportedByName?: string | null,
 ) {
   return {
     id: issue._id.toString(),
@@ -110,6 +114,7 @@ export function serializeIssue(
     description: issue.description,
     priority: issue.priority,
     status: issue.status,
+    reportedByName: reportedByName ?? "Tenant",
     property: property ?? null,
     tenancy: tenancy ?? null,
     createdAt: issue.createdAt.toISOString(),

@@ -32,8 +32,14 @@ import {
   StatCard,
 } from "@/components/dashboard";
 import { DisputeStatusBadge } from "@/features/disputes/components";
-import type { DashboardStat, DashboardSummary } from "@/features/dashboard/types";
-import { IssuePriorityBadge, IssueStatusBadge } from "@/features/issues/components";
+import type {
+  DashboardStat,
+  DashboardSummary,
+} from "@/features/dashboard/types";
+import {
+  IssuePriorityBadge,
+  IssueStatusBadge,
+} from "@/features/issues/components";
 
 type DashboardClientProps = {
   name: string;
@@ -49,7 +55,10 @@ const statIcons: Record<DashboardStat["icon"], LucideIcon> = {
   users: Users,
 };
 
-const iconToneClassNames: Record<NonNullable<DashboardStat["iconTone"]>, string> = {
+const iconToneClassNames: Record<
+  NonNullable<DashboardStat["iconTone"]>,
+  string
+> = {
   blue: "bg-blue-50 text-blue-600",
   emerald: "bg-emerald-50 text-emerald-600",
   orange: "bg-orange-50 text-orange-600",
@@ -127,7 +136,13 @@ export function DashboardClient({ name }: DashboardClientProps) {
   return <LandlordDashboard name={name} summary={summary} />;
 }
 
-function LandlordDashboard({ name, summary }: { name: string; summary: DashboardSummary }) {
+function LandlordDashboard({
+  name,
+  summary,
+}: {
+  name: string;
+  summary: DashboardSummary;
+}) {
   return (
     <>
       <DashboardWelcome
@@ -152,7 +167,13 @@ function LandlordDashboard({ name, summary }: { name: string; summary: Dashboard
   );
 }
 
-function TenantDashboard({ name, summary }: { name: string; summary: DashboardSummary }) {
+function TenantDashboard({
+  name,
+  summary,
+}: {
+  name: string;
+  summary: DashboardSummary;
+}) {
   return (
     <>
       <DashboardWelcome
@@ -165,7 +186,10 @@ function TenantDashboard({ name, summary }: { name: string; summary: DashboardSu
           description="Your recent issue activity from SmartRent records."
           title="Issue History"
         >
-          <DashboardLineChart data={issueTrend(summary)} label="Tenant issue history" />
+          <DashboardLineChart
+            data={issueTrend(summary)}
+            label="Tenant issue history"
+          />
         </DashboardChartCard>
         <DashboardChartCard
           description="Current issue and dispute activity for your tenancy."
@@ -173,9 +197,21 @@ function TenantDashboard({ name, summary }: { name: string; summary: DashboardSu
         >
           <DashboardBreakdown
             items={[
-              { label: "Open issues", value: countOpenIssues(summary).toString(), colorClassName: "bg-orange-500" },
-              { label: "Active disputes", value: countActiveDisputes(summary).toString(), colorClassName: "bg-rose-500" },
-              { label: "Resolved rate", value: `${summary.monthlyOverview.issueResolutionRate}%`, colorClassName: "bg-emerald-500" },
+              {
+                label: "Open issues",
+                value: countOpenIssues(summary).toString(),
+                colorClassName: "bg-orange-500",
+              },
+              {
+                label: "Active disputes",
+                value: countActiveDisputes(summary).toString(),
+                colorClassName: "bg-rose-500",
+              },
+              {
+                label: "Resolved rate",
+                value: `${summary.monthlyOverview.issueResolutionRate}%`,
+                colorClassName: "bg-emerald-500",
+              },
             ]}
           />
         </DashboardChartCard>
@@ -191,7 +227,13 @@ function TenantDashboard({ name, summary }: { name: string; summary: DashboardSu
   );
 }
 
-function AdminDashboard({ name, summary }: { name: string; summary: DashboardSummary }) {
+function AdminDashboard({
+  name,
+  summary,
+}: {
+  name: string;
+  summary: DashboardSummary;
+}) {
   return (
     <>
       <DashboardWelcome
@@ -204,13 +246,19 @@ function AdminDashboard({ name, summary }: { name: string; summary: DashboardSum
           description="Current platform totals from MongoDB."
           title="Platform Overview"
         >
-          <DashboardBarChart data={adminOverview(summary)} label="Admin platform overview" />
+          <DashboardBarChart
+            data={adminOverview(summary)}
+            label="Admin platform overview"
+          />
         </DashboardChartCard>
         <DashboardChartCard
           description="Operational activity from current issue and dispute records."
           title="Activity Volume"
         >
-          <DashboardBarChart data={activityVolume(summary)} label="Admin activity volume" />
+          <DashboardBarChart
+            data={activityVolume(summary)}
+            label="Admin activity volume"
+          />
         </DashboardChartCard>
       </div>
       <div className="mt-6 grid gap-6 2xl:grid-cols-[1.35fr_0.85fr]">
@@ -226,12 +274,14 @@ function AdminDashboard({ name, summary }: { name: string; summary: DashboardSum
 
 function StatsGrid({ stats }: { stats: DashboardStat[] }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map((item) => (
         <StatCard
           href={item.href}
           icon={statIcons[item.icon]}
-          iconClassName={item.iconTone ? iconToneClassNames[item.iconTone] : undefined}
+          iconClassName={
+            item.iconTone ? iconToneClassNames[item.iconTone] : undefined
+          }
           key={item.label}
           label={item.label}
           linkLabel={item.linkLabel}
@@ -255,7 +305,10 @@ function PortfolioCharts({ summary }: { summary: DashboardSummary }) {
         description="Current open issues grouped by priority."
         title="Issue Priorities"
       >
-        <DashboardBarChart data={issuePriorityVolume(summary)} label="Issue priority volume" />
+        <DashboardBarChart
+          data={issuePriorityVolume(summary)}
+          label="Issue priority volume"
+        />
       </DashboardChartCard>
     </div>
   );
@@ -276,10 +329,26 @@ function RecentIssues({ summary }: { summary: DashboardSummary }) {
     <DashboardCard title="Recent Issues">
       <DataTable
         columns={[
-          { header: "Issue", render: (row) => <Link className="font-medium text-blue-700 hover:text-blue-800" href={row.href}>{row.issue}</Link> },
+          {
+            header: "Issue",
+            render: (row) => (
+              <Link
+                className="font-medium text-blue-700 hover:text-blue-800"
+                href={row.href}
+              >
+                {row.issue}
+              </Link>
+            ),
+          },
           { header: "Property", render: (row) => row.property },
-          { header: "Priority", render: (row) => <IssuePriorityBadge priority={row.priority} /> },
-          { header: "Status", render: (row) => <IssueStatusBadge status={row.status} /> },
+          {
+            header: "Priority",
+            render: (row) => <IssuePriorityBadge priority={row.priority} />,
+          },
+          {
+            header: "Status",
+            render: (row) => <IssueStatusBadge status={row.status} />,
+          },
           { header: "Reported On", render: (row) => row.reportedOn },
         ]}
         rows={summary.recentIssues}
@@ -304,10 +373,23 @@ function RecentDisputes({ summary }: { summary: DashboardSummary }) {
     <DashboardCard title="Recent Disputes">
       <DataTable
         columns={[
-          { header: "Dispute ID", render: (row) => <Link className="font-medium text-blue-700 hover:text-blue-800" href={row.href}>{row.disputeId}</Link> },
+          {
+            header: "Dispute ID",
+            render: (row) => (
+              <Link
+                className="font-medium text-blue-700 hover:text-blue-800"
+                href={row.href}
+              >
+                {row.disputeId}
+              </Link>
+            ),
+          },
           { header: "Tenant", render: (row) => row.tenant },
           { header: "Property", render: (row) => row.property },
-          { header: "Status", render: (row) => <DisputeStatusBadge status={row.status} /> },
+          {
+            header: "Status",
+            render: (row) => <DisputeStatusBadge status={row.status} />,
+          },
           { header: "Updated On", render: (row) => row.updatedOn },
         ]}
         rows={summary.recentDisputes}
@@ -330,10 +412,10 @@ function RecentMessages({ summary }: { summary: DashboardSummary }) {
 
   return (
     <DashboardCard title="Recent Messages">
-      <div className="grid gap-3 p-5">
+      <div className="grid gap-2 p-4">
         {summary.recentMessages.map((message) => (
           <Link
-            className="block rounded-xl border border-slate-100 bg-slate-50 p-4 transition-colors hover:border-blue-200 hover:bg-blue-50"
+            className="block rounded-lg border border-slate-100 bg-slate-50 p-3 transition-colors hover:border-blue-200 hover:bg-blue-50"
             href={message.href}
             key={`${message.href}-${message.sender}`}
           >
@@ -341,7 +423,9 @@ function RecentMessages({ summary }: { summary: DashboardSummary }) {
               <p className="font-medium text-slate-950">{message.sender}</p>
               <p className="text-xs text-slate-500">{message.time}</p>
             </div>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{message.preview}</p>
+            <p className="mt-1.5 line-clamp-2 text-sm leading-5 text-slate-600">
+              {message.preview}
+            </p>
           </Link>
         ))}
       </div>
@@ -366,7 +450,12 @@ function RecentUsers({ summary }: { summary: DashboardSummary }) {
     <DashboardCard title="Recent Users">
       <DataTable
         columns={[
-          { header: "Name", render: (row) => <span className="font-medium text-slate-950">{row.name}</span> },
+          {
+            header: "Name",
+            render: (row) => (
+              <span className="font-medium text-slate-950">{row.name}</span>
+            ),
+          },
           { header: "Email", render: (row) => row.email },
           { header: "Role", render: (row) => row.role },
         ]}
@@ -382,10 +471,19 @@ function MonthlyOverview({ summary }: { summary: DashboardSummary }) {
 
   return (
     <DashboardCard title="Monthly Overview">
-      <div className="grid gap-4 p-5">
-        <OverviewMetric label="Expected Monthly Rent" value={formatCurrency(overview.expectedMonthlyRent)} />
-        <OverviewMetric label="Issue Resolution Rate" value={`${overview.issueResolutionRate}%`} />
-        <OverviewMetric label="Open Disputes" value={overview.openDisputes.toString()} />
+      <div className="grid gap-2 p-4">
+        <OverviewMetric
+          label="Expected Monthly Rent"
+          value={formatCurrency(overview.expectedMonthlyRent)}
+        />
+        <OverviewMetric
+          label="Issue Resolution Rate"
+          value={`${overview.issueResolutionRate}%`}
+        />
+        <OverviewMetric
+          label="Open Disputes"
+          value={overview.openDisputes.toString()}
+        />
       </div>
     </DashboardCard>
   );
@@ -393,9 +491,9 @@ function MonthlyOverview({ summary }: { summary: DashboardSummary }) {
 
 function OverviewMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
+      <p className="text-sm text-slate-600">{label}</p>
+      <p className="text-base font-semibold text-slate-950">{value}</p>
     </div>
   );
 }
@@ -403,7 +501,7 @@ function OverviewMetric({ label, value }: { label: string; value: string }) {
 function UpcomingActivities({ summary }: { summary: DashboardSummary }) {
   return (
     <DashboardCard title="Upcoming Activities">
-      <div className="grid gap-3 p-5">
+      <div className="grid gap-2 p-4">
         {summary.upcomingActivities.length > 0 ? (
           summary.upcomingActivities.map((activity) => (
             <ActivityItem
@@ -415,7 +513,9 @@ function UpcomingActivities({ summary }: { summary: DashboardSummary }) {
             />
           ))
         ) : (
-          <p className="text-sm text-slate-500">No upcoming activities are connected yet.</p>
+          <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-500">
+            No upcoming activities have been scheduled.
+          </p>
         )}
       </div>
     </DashboardCard>
@@ -425,23 +525,51 @@ function UpcomingActivities({ summary }: { summary: DashboardSummary }) {
 function QuickActions() {
   return (
     <DashboardCard title="Quick Actions">
-      <div className="grid gap-3 p-5 sm:grid-cols-2 2xl:grid-cols-1">
-        <QuickActionButton href="/properties/new" icon={Plus} label="Add New Property" />
-        <QuickActionButton href="/tenancies/new" icon={UserPlus} label="Add New Tenancy" />
-        <QuickActionButton href="/issues/new" icon={Wrench} label="Create Issue" />
-        <QuickActionButton href="/disputes/new" icon={Scale} label="Raise Dispute" />
+      <div className="grid gap-2 p-4 sm:grid-cols-2 2xl:grid-cols-1">
+        <QuickActionButton
+          href="/properties/new"
+          icon={Plus}
+          label="Add New Property"
+        />
+        <QuickActionButton
+          href="/tenancies/new"
+          icon={UserPlus}
+          label="Add New Tenancy"
+        />
+        <QuickActionButton
+          href="/issues/new"
+          icon={Wrench}
+          label="Create Issue"
+        />
+        <QuickActionButton
+          href="/disputes/new"
+          icon={Scale}
+          label="Raise Dispute"
+        />
         <QuickActionButton href="/messages" icon={Send} label="Send Message" />
-        <QuickActionButton href="/reports" icon={FileText} label="Generate Report" />
+        <QuickActionButton
+          href="/reports"
+          icon={FileText}
+          label="Generate Report"
+        />
       </div>
     </DashboardCard>
   );
 }
 
-function DashboardWelcome({ description, title }: { description: string; title: string }) {
+function DashboardWelcome({
+  description,
+  title,
+}: {
+  description: string;
+  title: string;
+}) {
   return (
     <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
       <div>
-        <h1 className="text-3xl font-semibold tracking-normal text-slate-950">{title}</h1>
+        <h1 className="text-3xl font-semibold tracking-normal text-slate-950">
+          {title}
+        </h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
       </div>
       <div className="flex w-fit items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
@@ -449,7 +577,9 @@ function DashboardWelcome({ description, title }: { description: string; title: 
         <div>
           <p className="text-xs font-medium text-slate-500">Today</p>
           <p className="text-sm font-semibold text-slate-950">
-            {new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(new Date())}
+            {new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(
+              new Date(),
+            )}
           </p>
         </div>
       </div>
@@ -466,7 +596,10 @@ function DashboardSkeleton({ name }: { name: string }) {
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div className="h-36 animate-pulse rounded-2xl border border-slate-200 bg-white" key={index} />
+          <div
+            className="h-36 animate-pulse rounded-2xl border border-slate-200 bg-white"
+            key={index}
+          />
         ))}
       </div>
       <div className="mt-6 grid gap-6 2xl:grid-cols-[1.45fr_0.75fr]">
@@ -491,9 +624,21 @@ function issueTrend(summary: DashboardSummary) {
 
 function issuePriorityVolume(summary: DashboardSummary) {
   return [
-    { label: "High", value: summary.recentIssues.filter((issue) => issue.priority === "high").length },
-    { label: "Medium", value: summary.recentIssues.filter((issue) => issue.priority === "medium").length },
-    { label: "Low", value: summary.recentIssues.filter((issue) => issue.priority === "low").length },
+    {
+      label: "High",
+      value: summary.recentIssues.filter((issue) => issue.priority === "high")
+        .length,
+    },
+    {
+      label: "Medium",
+      value: summary.recentIssues.filter((issue) => issue.priority === "medium")
+        .length,
+    },
+    {
+      label: "Low",
+      value: summary.recentIssues.filter((issue) => issue.priority === "low")
+        .length,
+    },
   ];
 }
 

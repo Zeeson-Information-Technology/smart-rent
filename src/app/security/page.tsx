@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Cloud, KeyRound, LockKeyhole, MailWarning, ShieldCheck, UserCog } from "lucide-react";
+import {
+  Cloud,
+  KeyRound,
+  LockKeyhole,
+  MailWarning,
+  ShieldCheck,
+  UserCog,
+} from "lucide-react";
 
 import { Footer, PageHero, SectionWrapper } from "@/components/marketing";
 import { PublicNavbar } from "@/components/navigation";
@@ -25,12 +32,12 @@ const securitySections = [
   {
     icon: UserCog,
     title: "Authentication",
-    body: "Authentication is planned as a dedicated access layer with session management and role-aware workspace controls. It is not connected in the current static UI.",
+    body: "SmartRent uses secure credential authentication, protected sessions, password hashing, and role-aware access controls for landlords, tenants, and administrators.",
   },
   {
     icon: Cloud,
     title: "Cloud security",
-    body: "Cloud infrastructure should follow least-privilege access, environment variable controls, audit logging, and secure deployment practices.",
+    body: "SmartRent uses managed cloud infrastructure with environment-based secret management, encrypted database connections, and secured evidence storage.",
   },
   {
     icon: MailWarning,
@@ -52,7 +59,10 @@ export default function SecurityPage() {
           >
             <Card className="bg-blue-600 text-white">
               <CardContent className="p-8">
-                <KeyRound className="h-10 w-10 text-blue-100" aria-hidden="true" />
+                <KeyRound
+                  className="h-10 w-10 text-blue-100"
+                  aria-hidden="true"
+                />
                 <p className="mt-8 text-2xl font-semibold leading-snug">
                   SmartRent security planning focuses on data protection,
                   authentication, cloud controls, and responsible disclosure.
@@ -69,7 +79,10 @@ export default function SecurityPage() {
               return (
                 <Card key={section.title}>
                   <CardContent className="p-6">
-                    <Icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                    <Icon
+                      className="h-6 w-6 text-blue-600"
+                      aria-hidden="true"
+                    />
                     <h2 className="mt-5 text-lg font-semibold text-slate-950">
                       {section.title}
                     </h2>

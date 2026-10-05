@@ -1,6 +1,10 @@
-import { TenancyModel, type TenancyDocument } from "@/database/models";
+import "server-only";
 
-export type TenantIdentity = { email: string; id: string };
+import { TenancyModel, type TenancyDocument } from "@/database/models";
+import {
+  getTenancyMemberRole,
+  type TenantIdentity,
+} from "@/lib/tenancy-membership";
 
 export function tenantMembershipConditions(user: TenantIdentity) {
   return [
@@ -15,15 +19,7 @@ export function tenantBelongsToTenancy(
   tenancy: TenancyDocument,
   user: TenantIdentity,
 ) {
-  const email = user.email.toLowerCase();
-
-  return (
-    tenancy.tenantId === user.id ||
-    tenancy.tenantEmail === email ||
-    tenancy.additionalTenants.some(
-      (tenant) => tenant.tenantId === user.id || tenant.email === email,
-    )
-  );
+  return getTenancyMemberRole(tenancy, user) !== null;
 }
 
 export async function findTenantTenancyForProperty(

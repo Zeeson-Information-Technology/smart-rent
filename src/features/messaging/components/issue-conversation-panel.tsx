@@ -63,7 +63,8 @@ export function IssueConversationPanel({
             Related conversation
           </p>
           <p className="mt-1 text-sm leading-6 text-slate-500">
-            Keep issue communication documented for future reporting and dispute workflows.
+            Keep issue communication documented for reporting and dispute
+            review.
           </p>
         </div>
       </div>
@@ -71,7 +72,9 @@ export function IssueConversationPanel({
         <MessageSquare className="h-4 w-4" aria-hidden="true" />
         {isOpening ? "Opening..." : "Message about this issue"}
       </Button>
-      {message ? <p className="text-sm font-medium text-red-600">{message}</p> : null}
+      {message ? (
+        <p className="text-sm font-medium text-red-600">{message}</p>
+      ) : null}
     </div>
   );
 }
